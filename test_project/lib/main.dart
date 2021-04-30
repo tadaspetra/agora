@@ -7,9 +7,8 @@ import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
 import 'package:permission_handler/permission_handler.dart';
 
-const appId = "7f4e31eb26824a8189d2dae24b597a86";
-const token =
-    "0067f4e31eb26824a8189d2dae24b597a86IACYJb6hgJzJSZwB2Z9faKF8P85iEMpg1n+Cvx4qeANpYtzDPrsAAAAAEAALtir+tmOMYAEAAQC2Y4xg";
+const appId = "";
+const token = "";
 
 void main() => runApp(MyApp());
 
@@ -77,7 +76,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter example app'),
+          title: const Text('Agora Video Call'),
         ),
         body: Stack(
           children: [
