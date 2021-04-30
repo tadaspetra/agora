@@ -22,13 +22,12 @@ class _MyAppState extends State<MyApp> {
   bool _localUserJoined = false;
   bool _showStats = false;
   int _remoteUid;
-  RtcEngine engine;
   RtcStats _stats = RtcStats();
 
   @override
-  void didChangeDependencies() {
+  void initState() {
+    super.initState();
     initForAgora();
-    super.didChangeDependencies();
   }
 
   Future<void> initForAgora() async {
@@ -36,7 +35,7 @@ class _MyAppState extends State<MyApp> {
     await [Permission.microphone, Permission.camera].request();
 
     // create the engine for communicating with agora
-    engine = await RtcEngine.create(appId);
+    RtcEngine engine = await RtcEngine.create(appId);
 
     // set up event handling for the engine
     engine.setEventHandler(RtcEngineEventHandler(
