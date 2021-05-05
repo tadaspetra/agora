@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  agora_rtc_engine: 
+  agora_rtc_engine: 3.3.3
   permission_handler:
 
 
