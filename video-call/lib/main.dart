@@ -1,16 +1,14 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
+
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
-import 'package:permission_handler/permission_handler.dart';
-
-const appId = "7f4e31eb26824a8189d2dae24b597a86";
-const token =
-    "0067f4e31eb26824a8189d2dae24b597a86IABzGq+88FgEvMF86+MBZGpQyIYWa/FfmLeZ0UkASb6FBdzDPrsAAAAAEAALtir+zeWSYAEAAQDN5ZJg";
+const appId = "bdda54611dd04c488495c680bada9079";
+const token = "006bdda54611dd04c488495c680bada9079IAAPZqpfzHFc3kCwyeRr89xkdDLFzcEPlEXaJu4pqEZXzNzDPrsAAAAAEAALtir+NEOUYAEAAQA0Q5Rg";
 
 void main() => runApp(MaterialApp(home: MyApp()));
 
@@ -21,7 +19,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _remoteUid;
-  RtcEngine engine;
+  RtcEngine _engine;
 
   @override
   void initState() {
@@ -33,36 +31,32 @@ class _MyAppState extends State<MyApp> {
     // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
 
-    // create the engine for communicating with agora
-    engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
-    // enable video
-    await engine.enableVideo();
+    //create the engine
+    _engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
 
-    engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine.enableVideo();
 
-    engine.setClientRole(ClientRole.Broadcaster);
+    _engine.setEventHandler(
+      RtcEngineEventHandler(
+        joinChannelSuccess: (String channel, int uid, int elapsed) {
+          print("local user $uid joined");
+        },
+        userJoined: (int uid, int elapsed) {
+          print("remote user $uid joined");
+          setState(() {
+            _remoteUid = uid;
+          });
+        },
+        userOffline: (int uid, UserOfflineReason reason) {
+          print("remote user $uid left channel");
+          setState(() {
+            _remoteUid = null;
+          });
+        },
+      ),
+    );
 
-    // set up event handling for the engine
-    engine.setEventHandler(RtcEngineEventHandler(
-      joinChannelSuccess: (String channel, int uid, int elapsed) {
-        print('$uid successfully joined channel: $channel ');
-        setState(() {});
-      },
-      userJoined: (int uid, int elapsed) {
-        print('remote user $uid joined channel');
-        setState(() {
-          _remoteUid = uid;
-        });
-      },
-      userOffline: (int uid, UserOfflineReason reason) {
-        print('remote user $uid left channel');
-        setState(() {
-          _remoteUid = null;
-        });
-      },
-    ));
-
-    await engine.joinChannel(token, 'firstchannel', null, 0);
+    await _engine.joinChannel(token, "firstchannel", null, 0);
   }
 
   // Create UI with local view and remote view
@@ -94,10 +88,7 @@ class _MyAppState extends State<MyApp> {
 
   // current user video
   Widget _renderLocalPreview() {
-    return Transform.rotate(
-      angle: 90 * pi / 180,
-      child: RtcLocalView.SurfaceView(),
-    );
+    return RtcLocalView.SurfaceView();
   }
 
   // remote user video
@@ -106,7 +97,7 @@ class _MyAppState extends State<MyApp> {
       return RtcRemoteView.SurfaceView(uid: _remoteUid);
     } else {
       return Text(
-        'Please wait remote user join',
+        'Please wait for remote user to join',
         textAlign: TextAlign.center,
       );
     }
