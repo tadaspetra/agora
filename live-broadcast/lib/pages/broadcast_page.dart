@@ -6,12 +6,9 @@ import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
 class BroadcastPage extends StatefulWidget {
   final String channelName;
-  final String userName;
   final bool isBroadcaster;
 
-  const BroadcastPage(
-      {Key key, this.channelName, this.userName, this.isBroadcaster})
-      : super(key: key);
+  const BroadcastPage({Key key, this.channelName, this.isBroadcaster}) : super(key: key);
 
   @override
   _BroadcastPageState createState() => _BroadcastPageState();
@@ -19,7 +16,6 @@ class BroadcastPage extends StatefulWidget {
 
 class _BroadcastPageState extends State<BroadcastPage> {
   final _users = <int>[];
-  final _infoStrings = <String>[];
   RtcEngine _engine;
   bool muted = false;
 
@@ -36,23 +32,43 @@ class _BroadcastPageState extends State<BroadcastPage> {
   void initState() {
     super.initState();
     // initialize agora sdk
-    initialize();
+    initializeAgora();
   }
 
-  Future<void> initialize() async {
-    print('Client Role: ${widget.isBroadcaster}');
-    if (appId.isEmpty) {
-      setState(() {
-        _infoStrings.add(
-          'APP_ID missing, please provide your APP_ID in settings.dart',
-        );
-        _infoStrings.add('Agora Engine is not starting');
-      });
-      return;
-    }
+  Future<void> initializeAgora() async {
     await _initAgoraRtcEngine();
-    _addAgoraEventHandlers();
-    await _engine.joinChannel(null, widget.channelName, null, 0);
+
+    _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
+      setState(() {
+        print('onError: $code');
+      });
+    }, joinChannelSuccess: (channel, uid, elapsed) {
+      setState(() {
+        print('onJoinChannel: $channel, uid: $uid');
+      });
+    }, leaveChannel: (stats) {
+      setState(() {
+        print('onLeaveChannel');
+        _users.clear();
+      });
+    }, userJoined: (uid, elapsed) {
+      setState(() {
+        print('userJoined: $uid');
+
+        _users.add(uid);
+      });
+    }, userOffline: (uid, elapsed) {
+      setState(() {
+        print('userOffline: $uid');
+        _users.remove(uid);
+      });
+    }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      setState(() {
+        print('firstRemoteVideo: $uid ${width}x $height');
+      });
+    }));
+
+    await _engine.joinChannel(token, widget.channelName, null, 0);
   }
 
   Future<void> _initAgoraRtcEngine() async {
@@ -66,41 +82,18 @@ class _BroadcastPageState extends State<BroadcastPage> {
     }
   }
 
-  /// Add agora event handlers
-  void _addAgoraEventHandlers() {
-    _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
-      setState(() {
-        final info = 'onError: $code';
-        _infoStrings.add(info);
-      });
-    }, joinChannelSuccess: (channel, uid, elapsed) {
-      setState(() {
-        final info = 'onJoinChannel: $channel, uid: $uid';
-        _infoStrings.add(info);
-      });
-    }, leaveChannel: (stats) {
-      setState(() {
-        _infoStrings.add('onLeaveChannel');
-        _users.clear();
-      });
-    }, userJoined: (uid, elapsed) {
-      setState(() {
-        final info = 'userJoined: $uid';
-        _infoStrings.add(info);
-        _users.add(uid);
-      });
-    }, userOffline: (uid, elapsed) {
-      setState(() {
-        final info = 'userOffline: $uid';
-        _infoStrings.add(info);
-        _users.remove(uid);
-      });
-    }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
-      setState(() {
-        final info = 'firstRemoteVideo: $uid ${width}x $height';
-        _infoStrings.add(info);
-      });
-    }));
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Stack(
+          children: <Widget>[
+            _broadcastView(),
+            _toolbar(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _toolbar() {
@@ -150,23 +143,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
               ],
             ),
           )
-        : Center(
-            child: Text("You Are Broadcasting right now!"),
-          );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            _viewRows(),
-            _toolbar(),
-          ],
-        ),
-      ),
-    );
+        : Container();
   }
 
   /// Helper function to get list of native views
@@ -179,14 +156,9 @@ class _BroadcastPageState extends State<BroadcastPage> {
     return list;
   }
 
-  /// Video view wrapper
-  Widget _videoView(view) {
-    return Expanded(child: Container(child: view));
-  }
-
   /// Video view row wrapper
-  Widget _expandedVideoRow(List<Widget> views) {
-    final wrappedViews = views.map<Widget>(_videoView).toList();
+  Widget _expandedVideoView(List<Widget> views) {
+    final wrappedViews = views.map<Widget>((view) => Expanded(child: Container(child: view))).toList();
     return Expanded(
       child: Row(
         children: wrappedViews,
@@ -195,37 +167,33 @@ class _BroadcastPageState extends State<BroadcastPage> {
   }
 
   /// Video layout wrapper
-  Widget _viewRows() {
+  Widget _broadcastView() {
     final views = _getRenderViews();
     switch (views.length) {
       case 1:
         return Container(
             child: Column(
-          children: <Widget>[_videoView(views[0])],
+          children: <Widget>[
+            _expandedVideoView([views[0]])
+          ],
         ));
       case 2:
         return Container(
             child: Column(
           children: <Widget>[
-            _expandedVideoRow([views[0]]),
-            _expandedVideoRow([views[1]])
+            _expandedVideoView([views[0]]),
+            _expandedVideoView([views[1]])
           ],
         ));
       case 3:
         return Container(
             child: Column(
-          children: <Widget>[
-            _expandedVideoRow(views.sublist(0, 2)),
-            _expandedVideoRow(views.sublist(2, 3))
-          ],
+          children: <Widget>[_expandedVideoView(views.sublist(0, 2)), _expandedVideoView(views.sublist(2, 3))],
         ));
       case 4:
         return Container(
             child: Column(
-          children: <Widget>[
-            _expandedVideoRow(views.sublist(0, 2)),
-            _expandedVideoRow(views.sublist(2, 4))
-          ],
+          children: <Widget>[_expandedVideoView(views.sublist(0, 2)), _expandedVideoView(views.sublist(2, 4))],
         ));
       default:
     }
