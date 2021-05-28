@@ -1,5 +1,6 @@
 import 'package:test_project/utils/appId.dart';
 import 'package:flutter/material.dart';
+
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
@@ -38,42 +39,40 @@ class _BroadcastPageState extends State<BroadcastPage> {
   Future<void> initializeAgora() async {
     await _initAgoraRtcEngine();
 
-    _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
-      setState(() {
-        print('onError: $code');
-      });
-    }, joinChannelSuccess: (channel, uid, elapsed) {
-      setState(() {
-        print('onJoinChannel: $channel, uid: $uid');
-      });
-    }, leaveChannel: (stats) {
-      setState(() {
-        print('onLeaveChannel');
-        _users.clear();
-      });
-    }, userJoined: (uid, elapsed) {
-      setState(() {
-        print('userJoined: $uid');
+    _engine.setEventHandler(RtcEngineEventHandler(
+      joinChannelSuccess: (channel, uid, elapsed) {
+        setState(() {
+          print('onJoinChannel: $channel, uid: $uid');
+        });
+      },
+      leaveChannel: (stats) {
+        setState(() {
+          print('onLeaveChannel');
+          _users.clear();
+        });
+      },
+      userJoined: (uid, elapsed) {
+        setState(() {
+          print('userJoined: $uid');
 
-        _users.add(uid);
-      });
-    }, userOffline: (uid, elapsed) {
-      setState(() {
-        print('userOffline: $uid');
-        _users.remove(uid);
-      });
-    }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
-      setState(() {
-        print('firstRemoteVideo: $uid ${width}x $height');
-      });
-    }));
+          _users.add(uid);
+        });
+      },
+      userOffline: (uid, elapsed) {
+        setState(() {
+          print('userOffline: $uid');
+          _users.remove(uid);
+        });
+      },
+    ));
 
-    await _engine.joinChannel(token, widget.channelName, null, 0);
+    await _engine.joinChannel(null, widget.channelName, null, 0);
   }
 
   Future<void> _initAgoraRtcEngine() async {
-    _engine = await RtcEngine.create(appId);
+    _engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
     await _engine.enableVideo();
+
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     if (widget.isBroadcaster) {
       await _engine.setClientRole(ClientRole.Broadcaster);
