@@ -13,5 +13,5 @@ void main() {
         home: App(),
       ),
     ),
-  ); // needed for riverpod to work
+  );
 }

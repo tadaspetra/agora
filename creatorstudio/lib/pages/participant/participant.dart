@@ -17,13 +17,13 @@ class _ParticipantPageState extends State<ParticipantPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Participant",
           style: TextStyle(color: Palette.black),
         ),
-        backgroundColor: Palette.lightGrey,
+        backgroundColor: Colors.transparent,
         foregroundColor: Palette.black,
-        iconTheme: const IconThemeData(color: Palette.black),
+        iconTheme: IconThemeData(color: Palette.black),
         shadowColor: Colors.transparent,
       ),
       body: Center(
@@ -38,7 +38,7 @@ class _ParticipantPageState extends State<ParticipantPage> {
               hintText: "Token",
               textController: tokenController,
             ),
-            ElevatedButton(onPressed: () {}, child: const Text("Join Channel"))
+            ElevatedButton(onPressed: () {}, child: Text("Join Channel"))
           ],
         ),
       ),

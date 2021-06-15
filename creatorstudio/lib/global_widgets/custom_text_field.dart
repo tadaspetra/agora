@@ -20,17 +20,17 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
   Widget build(BuildContext context) {
     return Align(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         child: TextFormField(
           controller: widget.textController,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            enabledBorder: const OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 color: Palette.darkerGrey,
               ),
             ),
-            focusedBorder: const OutlineInputBorder(
+            focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 color: Palette.darkerGrey,
               ),

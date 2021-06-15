@@ -1,5 +1,4 @@
-import 'package:creatorstudio/global_widgets/custom_text_field.dart';
-import 'package:creatorstudio/pages/director/director.dart';
+import 'package:creatorstudio/pages/director/joindirector.dart';
 import 'package:creatorstudio/pages/participant/participant.dart';
 import 'package:flutter/material.dart';
 
@@ -11,20 +10,23 @@ class App extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("What is your role?"),
+            Text("What is your role?"),
+            SizedBox(
+              height: 8,
+            ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 OutlinedButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ParticipantPage())),
-                  child: const Text("Participant"),
+                  child: Text("Participant"),
                 ),
-                const SizedBox(
-                  width: 4,
+                SizedBox(
+                  width: 8,
                 ),
                 ElevatedButton(
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DirectorPage())),
-                  child: const Text("Director"),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const JoinDirectorPage())),
+                  child: Text("Director"),
                 ),
               ],
             ),
