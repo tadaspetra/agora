@@ -1,25 +1,22 @@
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_uikit/agora_uikit.dart';
 import 'package:creatorstudio/config/app_id.dart';
 import 'package:creatorstudio/domain/participant/models/participant_call_model.dart';
-import 'package:creatorstudio/domain/rtc/rtc_repo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final participantCallController = StateNotifierProvider.autoDispose((ref) {
-  return ParticipantNotifier(ref.read);
+final participantController = StateNotifierProvider.autoDispose<ParticipantController, ParticipantCall>((ref) {
+  return ParticipantController(ref.read);
 });
 
-class ParticipantNotifier extends StateNotifier<ParticipantCall> {
+class ParticipantController extends StateNotifier<ParticipantCall> {
   final Reader read;
 
-  ParticipantNotifier(this.read) : super(ParticipantCall()) {
-    _initializeEngine();
-  }
-
-  Future<void> _initializeEngine() async {
-    state = state.copyWith(engine: await RtcEngine.createWithConfig(RtcEngineConfig(appId)));
-  }
+  ParticipantController(this.read) : super(ParticipantCall());
 
   Future<void> joinCall({required String channel}) async {
-    read(rtcRepoProvider).joinCall(state.engine!, channel);
+    state = state.copyWith(
+      client: AgoraClient(
+          agoraConnectionData: AgoraConnectionData(appId: appId, channelName: channel),
+          enabledPermission: [Permission.camera, Permission.microphone]),
+    );
   }
 }

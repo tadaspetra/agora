@@ -24,7 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   agora_rtc_engine: ^4.0.1
-  agora_rtm: ^0.9.14
+  agora_rtm: ^1.0.0-rc.1
+  agora_uikit: ^0.0.2
   cupertino_icons: ^1.0.2
   flutter_riverpod: ^0.14.0+3
   lints: ^1.0.1

@@ -1,5 +1,4 @@
 import 'package:creatorstudio/config/palette.dart';
-import 'package:creatorstudio/domain/host/models/host_call_model.dart';
 import 'package:creatorstudio/global_widgets/custom_text_field.dart';
 import 'package:creatorstudio/providers/host_provider.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class _DirectorPageState extends State<JoinDirectorPage> {
             ),
             Consumer(
               builder: (BuildContext context, T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
-                HostNotifier host = watch(hostNotifier.notifier);
+                HostController host = watch(hostController.notifier);
                 return ElevatedButton(
                   onPressed: () {
                     host.joinCall(channel: channelNameController.text);

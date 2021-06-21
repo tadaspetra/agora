@@ -1,17 +1,17 @@
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_uikit/agora_uikit.dart';
 
 class ParticipantCall {
-  final RtcEngine? engine;
+  final AgoraClient? client;
 
   ParticipantCall({
-    this.engine,
+    this.client,
   });
 
   ParticipantCall copyWith({
-    RtcEngine? engine,
+    AgoraClient? client,
   }) {
     return ParticipantCall(
-      engine: engine ?? this.engine,
+      client: client ?? this.client,
     );
   }
 }

@@ -5,6 +5,7 @@ INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/androi
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml:1:1-41:12
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml:1:1-41:12
 MERGED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml:1:1-41:12
+MERGED from [:agora_uikit] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_uikit/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-23:12
 MERGED from [:permission_handler] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/permission_handler/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-11:12
@@ -98,6 +99,8 @@ uses-sdk
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml
+MERGED from [:agora_uikit] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_uikit/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:agora_uikit] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_uikit/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:6:5-8:41
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:6:5-8:41
 MERGED from [:permission_handler] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/permission_handler/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44

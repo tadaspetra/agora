@@ -4,14 +4,14 @@ import 'package:creatorstudio/domain/host/models/host_call_model.dart';
 import 'package:creatorstudio/domain/rtc/rtc_repo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final hostNotifier = StateNotifierProvider.autoDispose<HostNotifier, HostCall>((ref) {
-  return HostNotifier(ref.read);
+final hostController = StateNotifierProvider.autoDispose<HostController, HostCall>((ref) {
+  return HostController(ref.read);
 });
 
-class HostNotifier extends StateNotifier<HostCall> {
+class HostController extends StateNotifier<HostCall> {
   final Reader read;
 
-  HostNotifier(this.read) : super(HostCall()) {
+  HostController(this.read) : super(HostCall()) {
     _initializeEngine();
   }
 
@@ -20,6 +20,6 @@ class HostNotifier extends StateNotifier<HostCall> {
   }
 
   Future<void> joinCall({required String channel}) async {
-    read(rtcRepoProvider).joinCall(state.engine!, channel);
+    read(rtcRepoProvider).joinCallAsDirector(state, channel);
   }
 }

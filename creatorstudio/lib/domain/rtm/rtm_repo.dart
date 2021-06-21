@@ -6,7 +6,11 @@ class RtmRepo {
   Reader read;
   RtmRepo(this.read);
 
-  Future<void> joinCall(String channelName, String token) {
+  Future<void> initializeClient(String channelName, String token) {
+    throw (UnimplementedError);
+  }
+
+  Future<void> initializeChannel(String channelName, String token) {
     throw (UnimplementedError);
   }
 }

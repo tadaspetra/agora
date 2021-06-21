@@ -1,5 +1,5 @@
 import 'package:creatorstudio/pages/director/joindirector.dart';
-import 'package:creatorstudio/pages/participant/participant.dart';
+import 'package:creatorstudio/pages/participant/joinparticipant.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -18,7 +18,7 @@ class App extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 OutlinedButton(
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ParticipantPage())),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const JoinParticipantPage())),
                   child: Text("Participant"),
                 ),
                 SizedBox(
