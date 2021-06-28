@@ -19,6 +19,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
   final _users = <int>[];
   RtcEngine _engine;
   bool muted = false;
+  int streamId;
 
   @override
   void dispose() {
@@ -38,6 +39,8 @@ class _BroadcastPageState extends State<BroadcastPage> {
 
   Future<void> initializeAgora() async {
     await _initAgoraRtcEngine();
+
+    if (widget.isBroadcaster) streamId = await _engine?.createDataStream(false, false);
 
     _engine.setEventHandler(RtcEngineEventHandler(
       joinChannelSuccess: (channel, uid, elapsed) {
@@ -63,6 +66,14 @@ class _BroadcastPageState extends State<BroadcastPage> {
           print('userOffline: $uid');
           _users.remove(uid);
         });
+      },
+      streamMessage: (_, __, message) {
+        final String info = "here is the message $message";
+        print(info);
+      },
+      streamMessageError: (_, __, error, ___, ____) {
+        final String info = "here is the error $error";
+        print(info);
       },
     ));
 
@@ -211,6 +222,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
   }
 
   void _onSwitchCamera() {
-    _engine.switchCamera();
+    if (streamId != null) _engine?.sendStreamMessage(streamId, "mute user blet");
+    //_engine.switchCamera();
   }
 }

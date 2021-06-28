@@ -1,17 +1,19 @@
-import 'package:creatorstudio/config/theme.dart';
+import 'package:creatorstudio/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app.dart';
-
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    ProviderScope(
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
       child: MaterialApp(
-        theme: CustomTheme().lightTheme(),
-        home: App(),
+        home: MyHomePage(),
       ),
-    ),
-  );
+    );
+  }
 }
