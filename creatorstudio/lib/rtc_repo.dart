@@ -20,12 +20,7 @@ class RtcRepo {
           leaveChannel: (stats) {},
           userJoined: (uid, elapsed) {},
           userOffline: (uid, reason) {},
-          streamMessage: (_, __, message) {
-            if (message == "mute " + read(directorController).localUid.toString()) {
-              engine.muteLocalAudioStream(true);
-              read(directorController.notifier).toggleLocalAudio();
-            }
-          },
+          streamMessage: (_, __, message) {},
           streamMessageError: (_, __, error, ___, ____) {
             final String info = "here is the error $error";
             print(info);
@@ -33,23 +28,37 @@ class RtcRepo {
         ));
     engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     engine.setClientRole(ClientRole.Broadcaster);
+    engine.enableVideo();
     engine.joinChannel(null, channel, null, 0);
   }
 
   Future<void> joinCallAsDirector(RtcEngine engine, String channel) async {
-    joinCall(
-      engine: engine,
-      channel: channel,
-      eventHandler: RtcEngineEventHandler(
+    await [Permission.camera, Permission.microphone].request();
+    engine.setEventHandler(
+      RtcEngineEventHandler(
         error: (code) {},
         joinChannelSuccess: (channel, uid, elapsed) {
           print("DIRECTOR");
         },
         leaveChannel: (stats) {},
-        userJoined: (uid, elapsed) {},
-        userOffline: (uid, reason) {},
+        userJoined: (uid, elapsed) {
+          read(directorController.notifier).addUser(uid: uid);
+        },
+        userOffline: (uid, reason) {
+          read(directorController.notifier).removeUser(uid: uid);
+        },
+        remoteAudioStateChanged: (uid, state, reason, elapsed) {
+          if (state == AudioRemoteState.Decoding && reason == AudioRemoteStateReason.RemoteUnmuted) {
+            read(directorController.notifier).updateUserAudio(uid: uid, muted: false);
+          } else if (state == AudioRemoteState.Stopped && reason == AudioRemoteStateReason.RemoteMuted) {
+            read(directorController.notifier).updateUserAudio(uid: uid, muted: true);
+          }
+        },
       ),
     );
+    engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    engine.setClientRole(ClientRole.Broadcaster);
+    engine.enableVideo();
+    engine.joinChannel(null, channel, null, 0);
   }
-  //rtm stuff
 }

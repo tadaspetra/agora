@@ -43,8 +43,6 @@ class _BroadcastPageState extends State<ParticipantPage> {
   Future<void> initializeAgora() async {
     await _initAgoraRtcEngine();
 
-    streamId = await _engine.createDataStream(false, false);
-
     _engine.setEventHandler(RtcEngineEventHandler(
       joinChannelSuccess: (channel, uid, elapsed) {
         setState(() {
@@ -225,7 +223,6 @@ class _BroadcastPageState extends State<ParticipantPage> {
   }
 
   void _onSwitchCamera() {
-    if (streamId != null) _engine.sendStreamMessage(streamId!, "mute " + _users[0].toString());
-    //_engine.switchCamera();
+    _engine.switchCamera();
   }
 }

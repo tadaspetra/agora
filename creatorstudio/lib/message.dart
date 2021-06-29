@@ -1,5 +1,5 @@
 class Message {
-  String sendMuteMessage({required String uid}) {
+  String sendMuteMessage({required int uid}) {
     return "mute $uid";
   }
 }

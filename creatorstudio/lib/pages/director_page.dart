@@ -22,159 +22,107 @@ class BroadcastPage extends StatefulWidget {
 }
 
 class _BroadcastPageState extends State<BroadcastPage> {
-  final _users = <int>[];
-
   @override
   void initState() {
-    // TODO: implement initState
     context.read(directorController.notifier).joinCall(channel: widget.channelName);
     super.initState();
   }
 
   @override
-  void dispose() {
-    // clear users
-    _users.clear();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Consumer(
-          builder: (BuildContext context, T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
-            DirectorController directorNotifier = watch(directorController.notifier);
-            DirectorModel directorData = watch(directorController);
-            return Stack(
-              children: <Widget>[
-                _broadcastView(),
-                _toolbar(directorData, directorNotifier),
-              ],
-            );
-          },
+    return Consumer(builder: (BuildContext context, T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
+      DirectorController directorNotifier = watch(directorController.notifier);
+      DirectorModel directorData = watch(directorController);
+      Size size = MediaQuery.of(context).size;
+      return Scaffold(
+          body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CustomScrollView(
+          slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  SafeArea(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text("Add Stream Destination"),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SliverGrid(
+              gridDelegate:
+                  SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: size.width / 2, crossAxisSpacing: 20, mainAxisSpacing: 20),
+              delegate: SliverChildBuilderDelegate((BuildContext ctx, index) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: RtcRemoteView.SurfaceView(
+                                uid: directorData.activeUsers.elementAt(index).uid,
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.black54),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    icon: Icon(Icons.mic_off),
+                                    color: directorData.activeUsers.elementAt(index).muted ? Colors.red : Colors.white,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    icon: Icon(Icons.videocam_off),
+                                    color: Colors.white,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    icon: Icon(Icons.arrow_downward),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }, childCount: directorData.activeUsers.length),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Divider(
+                      thickness: 3,
+                      indent: 80,
+                      endIndent: 80,
+                    ),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        directorNotifier.leaveCall();
+                        Navigator.pop(context);
+                      },
+                      child: Text("Leave Call"))
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
-    );
+      ));
+    });
   }
-
-  Widget _toolbar(DirectorModel directorModel, DirectorController directorController) {
-    return Container(
-      alignment: Alignment.bottomCenter,
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          RawMaterialButton(
-            onPressed: () => directorController.toggleLocalAudio(),
-            child: Icon(
-              directorModel.localMuted ? Icons.mic_off : Icons.mic,
-              color: directorModel.localMuted ? Colors.white : Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: directorModel.localMuted ? Colors.blueAccent : Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          ),
-          RawMaterialButton(
-            onPressed: () => _onCallEnd(context),
-            child: Icon(
-              Icons.call_end,
-              color: Colors.white,
-              size: 35.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.redAccent,
-            padding: const EdgeInsets.all(15.0),
-          ),
-          RawMaterialButton(
-            onPressed: () {
-              if (directorModel.streamId != null) {
-                directorModel.engine?.sendStreamMessage(directorModel.streamId!, Message().sendMuteMessage(uid: _users[0].toString()));
-              }
-            },
-            child: Icon(
-              Icons.switch_camera,
-              color: Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Helper function to get list of native views
-  List<Widget> _getRenderViews() {
-    final List<StatefulWidget> list = [];
-    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
-    return list;
-  }
-
-  /// Video view row wrapper
-  Widget _expandedVideoView(List<Widget> views) {
-    final wrappedViews = views.map<Widget>((view) => Expanded(child: Container(child: view))).toList();
-    return Expanded(
-      child: Row(
-        children: wrappedViews,
-      ),
-    );
-  }
-
-  /// Video layout wrapper
-  Widget _broadcastView() {
-    final views = _getRenderViews();
-    switch (views.length) {
-      case 1:
-        return Container(
-            child: Column(
-          children: <Widget>[
-            _expandedVideoView([views[0]])
-          ],
-        ));
-      case 2:
-        return Container(
-            child: Column(
-          children: <Widget>[
-            _expandedVideoView([views[0]]),
-            _expandedVideoView([views[1]])
-          ],
-        ));
-      case 3:
-        return Container(
-            child: Column(
-          children: <Widget>[_expandedVideoView(views.sublist(0, 2)), _expandedVideoView(views.sublist(2, 3))],
-        ));
-      case 4:
-        return Container(
-            child: Column(
-          children: <Widget>[_expandedVideoView(views.sublist(0, 2)), _expandedVideoView(views.sublist(2, 4))],
-        ));
-      default:
-    }
-    return Container();
-  }
-
-  void _onCallEnd(BuildContext context) {
-    context.read(directorController.notifier).leaveCall();
-    Navigator.pop(context);
-  }
-
-  // void _onToggleMute() {
-  //   setState(() {
-  //     muted = !muted;
-  //   });
-  //   _engine.muteLocalAudioStream(muted);
-  // }
-
-  // void _onSwitchCamera() {
-  //   if (streamId != null) _engine.sendStreamMessage(streamId!, Message().sendMuteMessage(uid: _users[0].toString()));
-  //   //_engine.switchCamera();
-  // }
 }
