@@ -42,7 +42,7 @@ class RtcRepo {
           },
           leaveChannel: (stats) {},
           userJoined: (uid, elapsed) {
-            read(directorController.notifier).addUser(uid: uid);
+            read(directorController.notifier).addUserToLobby(uid: uid);
           },
           userOffline: (uid, reason) {
             read(directorController.notifier).removeUser(uid: uid);

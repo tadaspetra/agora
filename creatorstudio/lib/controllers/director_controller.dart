@@ -64,18 +64,61 @@ class DirectorController extends StateNotifier<DirectorModel> {
     }
   }
 
-  Future<void> addUser({required int uid}) async {
-    state = state.copyWith(activeUsers: {...state.activeUsers, AgoraUser(uid: uid)});
+  Future<void> addUserToLobby({required int uid}) async {
+    state = state.copyWith(lobbyUsers: {
+      ...state.lobbyUsers,
+      AgoraUser(
+        uid: uid,
+      )
+    });
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
   }
 
-  Future<void> removeUser({required int uid}) async {
+  Future<void> promoteToActiveUser({required int uid}) async {
+    Set<AgoraUser> _tempLobby = state.lobbyUsers;
+    for (int i = 0; i < _tempLobby.length; i++) {
+      if (_tempLobby.elementAt(i).uid == uid) {
+        _tempLobby.remove(_tempLobby.elementAt(i));
+      }
+    }
+    state = state.copyWith(activeUsers: {
+      ...state.activeUsers,
+      AgoraUser(
+        uid: uid,
+      )
+    }, lobbyUsers: _tempLobby);
+  }
+
+  Future<void> demoteToLobbyUser({required int uid}) async {
     Set<AgoraUser> _temp = state.activeUsers;
     for (int i = 0; i < _temp.length; i++) {
       if (_temp.elementAt(i).uid == uid) {
         _temp.remove(_temp.elementAt(i));
       }
     }
-    state = state.copyWith(activeUsers: _temp);
+    state = state.copyWith(activeUsers: _temp, lobbyUsers: {
+      ...state.lobbyUsers,
+      AgoraUser(
+        uid: uid,
+      )
+    });
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+  }
+
+  Future<void> removeUser({required int uid}) async {
+    Set<AgoraUser> _temp = state.activeUsers;
+    Set<AgoraUser> _tempLobby = state.lobbyUsers;
+    for (int i = 0; i < _temp.length; i++) {
+      if (_temp.elementAt(i).uid == uid) {
+        _temp.remove(_temp.elementAt(i));
+      }
+    }
+    for (int i = 0; i < _tempLobby.length; i++) {
+      if (_tempLobby.elementAt(i).uid == uid) {
+        _tempLobby.remove(_tempLobby.elementAt(i));
+      }
+    }
+    state = state.copyWith(activeUsers: _temp, lobbyUsers: _tempLobby);
   }
 
   Future<void> startStream() async {

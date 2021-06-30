@@ -95,7 +95,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      throw (UnimplementedError);
+                                      directorNotifier.demoteToLobbyUser(uid: directorData.activeUsers.elementAt(index).uid);
                                     },
                                     icon: Icon(Icons.arrow_downward),
                                     color: Colors.white,
@@ -122,6 +122,55 @@ class _BroadcastPageState extends State<BroadcastPage> {
                       endIndent: 80,
                     ),
                   ),
+                ],
+              ),
+            ),
+            SliverGrid(
+              gridDelegate:
+                  SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: size.width / 2, crossAxisSpacing: 20, mainAxisSpacing: 20),
+              delegate: SliverChildBuilderDelegate((BuildContext ctx, index) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: directorData.lobbyUsers.elementAt(index).videoDisabled
+                                  ? Container(
+                                      color: Colors.black,
+                                    )
+                                  : RtcRemoteView.SurfaceView(
+                                      uid: directorData.lobbyUsers.elementAt(index).uid,
+                                    ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.black54),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      directorNotifier.promoteToActiveUser(uid: directorData.lobbyUsers.elementAt(index).uid);
+                                    },
+                                    icon: Icon(Icons.arrow_upward),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }, childCount: directorData.lobbyUsers.length),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
                   ElevatedButton(
                     onPressed: () {
                       directorNotifier.leaveCall();
