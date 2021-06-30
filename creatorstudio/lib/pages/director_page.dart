@@ -46,7 +46,12 @@ class _BroadcastPageState extends State<BroadcastPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text("Add Stream Destination"),
+                        TextButton(
+                          child: Text("Add Stream Destination"),
+                          onPressed: () {
+                            throw (UnimplementedError);
+                          },
+                        ),
                       ],
                     ),
                   )
@@ -65,9 +70,13 @@ class _BroadcastPageState extends State<BroadcastPage> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: RtcRemoteView.SurfaceView(
-                                uid: directorData.activeUsers.elementAt(index).uid,
-                              ),
+                              child: directorData.activeUsers.elementAt(index).videoDisabled
+                                  ? Container(
+                                      color: Colors.black,
+                                    )
+                                  : RtcRemoteView.SurfaceView(
+                                      uid: directorData.activeUsers.elementAt(index).uid,
+                                    ),
                             ),
                             Container(
                               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.black54),
@@ -80,12 +89,14 @@ class _BroadcastPageState extends State<BroadcastPage> {
                                     color: directorData.activeUsers.elementAt(index).muted ? Colors.red : Colors.white,
                                   ),
                                   IconButton(
-                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    onPressed: () => directorNotifier.toggleUserVideo(index: index),
                                     icon: Icon(Icons.videocam_off),
-                                    color: Colors.white,
+                                    color: directorData.activeUsers.elementAt(index).videoDisabled ? Colors.red : Colors.white,
                                   ),
                                   IconButton(
-                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    onPressed: () {
+                                      throw (UnimplementedError);
+                                    },
                                     icon: Icon(Icons.arrow_downward),
                                     color: Colors.white,
                                   ),
@@ -112,11 +123,25 @@ class _BroadcastPageState extends State<BroadcastPage> {
                     ),
                   ),
                   ElevatedButton(
-                      onPressed: () {
-                        directorNotifier.leaveCall();
-                        Navigator.pop(context);
-                      },
-                      child: Text("Leave Call"))
+                    onPressed: () {
+                      directorNotifier.leaveCall();
+                      Navigator.pop(context);
+                    },
+                    child: Text("Leave Call"),
+                  ),
+                  directorData.isLive
+                      ? ElevatedButton(
+                          onPressed: () {
+                            throw (UnimplementedError);
+                          },
+                          child: Text("End Livestream"),
+                        )
+                      : ElevatedButton(
+                          onPressed: () {
+                            throw (UnimplementedError);
+                          },
+                          child: Text("Start Livestream"),
+                        ),
                 ],
               ),
             ),

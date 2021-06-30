@@ -21,6 +21,7 @@ class _BroadcastPageState extends State<ParticipantPage> {
   final _users = <int>[];
   late RtcEngine _engine;
   bool muted = false;
+  bool videoDisabled = false;
   int? streamId;
   int? localUid;
 
@@ -71,8 +72,10 @@ class _BroadcastPageState extends State<ParticipantPage> {
       },
       streamMessage: (_, __, message) {
         setState(() {
-          if (message == "mute " + localUid.toString()) {
+          if (message == "audio " + localUid.toString()) {
             _onToggleMute();
+          } else if (message == "video " + localUid.toString()) {
+            _onToggleVideoDisabled();
           }
         });
         final String info = "here is the message $message";
@@ -140,6 +143,18 @@ class _BroadcastPageState extends State<ParticipantPage> {
             elevation: 2.0,
             fillColor: Colors.redAccent,
             padding: const EdgeInsets.all(15.0),
+          ),
+          RawMaterialButton(
+            onPressed: _onToggleVideoDisabled,
+            child: Icon(
+              videoDisabled ? Icons.videocam_off : Icons.videocam,
+              color: videoDisabled ? Colors.white : Colors.blueAccent,
+              size: 20.0,
+            ),
+            shape: CircleBorder(),
+            elevation: 2.0,
+            fillColor: videoDisabled ? Colors.blueAccent : Colors.white,
+            padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
             onPressed: _onSwitchCamera,
@@ -220,6 +235,13 @@ class _BroadcastPageState extends State<ParticipantPage> {
       muted = !muted;
     });
     _engine.muteLocalAudioStream(muted);
+  }
+
+  void _onToggleVideoDisabled() {
+    setState(() {
+      videoDisabled = !videoDisabled;
+    });
+    _engine.muteLocalVideoStream(videoDisabled);
   }
 
   void _onSwitchCamera() {

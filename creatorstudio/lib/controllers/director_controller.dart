@@ -37,14 +37,32 @@ class DirectorController extends StateNotifier<DirectorModel> {
   }
 
   Future<void> updateUserAudio({required int uid, required bool muted}) async {
-    AgoraUser _temp = state.activeUsers.singleWhere((element) => element.uid == uid);
-    Set<AgoraUser> _tempSet = state.activeUsers;
-    _tempSet.remove(_temp);
-    _tempSet.add(_temp.copyWith(muted: muted));
-    state = state.copyWith(activeUsers: _tempSet);
+    try {
+      AgoraUser _temp = state.activeUsers.singleWhere((element) => element.uid == uid);
+      Set<AgoraUser> _tempSet = state.activeUsers;
+      _tempSet.remove(_temp);
+      _tempSet.add(_temp.copyWith(muted: muted));
+      state = state.copyWith(activeUsers: _tempSet);
+    } catch (e) {
+      return;
+    }
   }
 
-  Future<void> toggleUserVideo({required int uid}) async {}
+  Future<void> toggleUserVideo({required int index}) async {
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: state.activeUsers.elementAt(index).uid));
+  }
+
+  Future<void> updateUserVideo({required int uid, required bool videoDisabled}) async {
+    try {
+      AgoraUser _temp = state.activeUsers.singleWhere((element) => element.uid == uid);
+      Set<AgoraUser> _tempSet = state.activeUsers;
+      _tempSet.remove(_temp);
+      _tempSet.add(_temp.copyWith(videoDisabled: videoDisabled));
+      state = state.copyWith(activeUsers: _tempSet);
+    } catch (e) {
+      return;
+    }
+  }
 
   Future<void> addUser({required int uid}) async {
     state = state.copyWith(activeUsers: {...state.activeUsers, AgoraUser(uid: uid)});
@@ -58,5 +76,21 @@ class DirectorController extends StateNotifier<DirectorModel> {
       }
     }
     state = state.copyWith(activeUsers: _temp);
+  }
+
+  Future<void> startStream() async {
+    List<TranscodingUser> transcodingUsers = [];
+    for (int i = 0; i < state.activeUsers.length; i++) {
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(i).uid, 0, 0));
+    }
+    LiveTranscoding transcoding = LiveTranscoding(
+      transcodingUsers,
+    );
+    state.engine?.setLiveTranscoding(transcoding);
+    state.engine?.addPublishStreamUrl("url", true);
+  }
+
+  Future<void> endStream() async {
+    state.engine?.removePublishStreamUrl("url");
   }
 }
