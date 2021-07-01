@@ -1,3 +1,4 @@
+import 'package:creatorstudio/message.dart';
 import 'package:creatorstudio/utils/appId.dart';
 import 'package:flutter/material.dart';
 
@@ -18,12 +19,13 @@ class ParticipantPage extends StatefulWidget {
 }
 
 class _BroadcastPageState extends State<ParticipantPage> {
-  final _users = <int>[];
+  List<int> _users = <int>[];
   late RtcEngine _engine;
   bool muted = false;
   bool videoDisabled = false;
   int? streamId;
   int? localUid;
+  bool activeUser = false;
 
   @override
   void dispose() {
@@ -61,21 +63,24 @@ class _BroadcastPageState extends State<ParticipantPage> {
         setState(() {
           print('userJoined: $uid');
 
-          _users.add(uid);
+          //_users.add(uid);
         });
       },
       userOffline: (uid, elapsed) {
         setState(() {
           print('userOffline: $uid');
-          _users.remove(uid);
+          //_users.remove(uid);
         });
       },
       streamMessage: (_, __, message) {
         setState(() {
+          List<String> parsedMessage = message.split(" ");
           if (message == "audio " + localUid.toString()) {
             _onToggleMute();
           } else if (message == "video " + localUid.toString()) {
             _onToggleVideoDisabled();
+          } else if (parsedMessage[0] == "activeUsers") {
+            _users = Message().parseActiveUsers(uids: parsedMessage[1]);
           }
         });
         final String info = "here is the message $message";
@@ -120,18 +125,20 @@ class _BroadcastPageState extends State<ParticipantPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          RawMaterialButton(
-            onPressed: _onToggleMute,
-            child: Icon(
-              muted ? Icons.mic_off : Icons.mic,
-              color: muted ? Colors.white : Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: muted ? Colors.blueAccent : Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          ),
+          activeUser
+              ? RawMaterialButton(
+                  onPressed: _onToggleMute,
+                  child: Icon(
+                    muted ? Icons.mic_off : Icons.mic,
+                    color: muted ? Colors.white : Colors.blueAccent,
+                    size: 20.0,
+                  ),
+                  shape: CircleBorder(),
+                  elevation: 2.0,
+                  fillColor: muted ? Colors.blueAccent : Colors.white,
+                  padding: const EdgeInsets.all(12.0),
+                )
+              : SizedBox(),
           RawMaterialButton(
             onPressed: () => _onCallEnd(context),
             child: Icon(
@@ -144,30 +151,34 @@ class _BroadcastPageState extends State<ParticipantPage> {
             fillColor: Colors.redAccent,
             padding: const EdgeInsets.all(15.0),
           ),
-          RawMaterialButton(
-            onPressed: _onToggleVideoDisabled,
-            child: Icon(
-              videoDisabled ? Icons.videocam_off : Icons.videocam,
-              color: videoDisabled ? Colors.white : Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: videoDisabled ? Colors.blueAccent : Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          ),
-          RawMaterialButton(
-            onPressed: _onSwitchCamera,
-            child: Icon(
-              Icons.switch_camera,
-              color: Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          ),
+          activeUser
+              ? RawMaterialButton(
+                  onPressed: _onToggleVideoDisabled,
+                  child: Icon(
+                    videoDisabled ? Icons.videocam_off : Icons.videocam,
+                    color: videoDisabled ? Colors.white : Colors.blueAccent,
+                    size: 20.0,
+                  ),
+                  shape: CircleBorder(),
+                  elevation: 2.0,
+                  fillColor: videoDisabled ? Colors.blueAccent : Colors.white,
+                  padding: const EdgeInsets.all(12.0),
+                )
+              : SizedBox(),
+          activeUser
+              ? RawMaterialButton(
+                  onPressed: _onSwitchCamera,
+                  child: Icon(
+                    Icons.switch_camera,
+                    color: Colors.blueAccent,
+                    size: 20.0,
+                  ),
+                  shape: CircleBorder(),
+                  elevation: 2.0,
+                  fillColor: Colors.white,
+                  padding: const EdgeInsets.all(12.0),
+                )
+              : SizedBox(),
         ],
       ),
     );
@@ -176,9 +187,21 @@ class _BroadcastPageState extends State<ParticipantPage> {
   /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
     final List<StatefulWidget> list = [];
-    list.add(RtcLocalView.SurfaceView());
+    bool checkIfLocalActive = false;
+    for (int i = 0; i < _users.length; i++) {
+      if (_users[i] == localUid) {
+        list.add(RtcLocalView.SurfaceView());
+        checkIfLocalActive = true;
+      } else {
+        list.add(RtcRemoteView.SurfaceView(uid: _users[i]));
+      }
+    }
 
-    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+    if (checkIfLocalActive) {
+      activeUser = true;
+    } else {
+      activeUser = false;
+    }
     return list;
   }
 

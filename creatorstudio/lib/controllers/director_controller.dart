@@ -72,6 +72,7 @@ class DirectorController extends StateNotifier<DirectorModel> {
       )
     });
     state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
   }
 
   Future<void> promoteToActiveUser({required int uid}) async {
@@ -87,12 +88,23 @@ class DirectorController extends StateNotifier<DirectorModel> {
         uid: uid,
       )
     }, lobbyUsers: _tempLobby);
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
   }
 
   Future<void> demoteToLobbyUser({required int uid}) async {
     Set<AgoraUser> _temp = state.activeUsers;
+    bool wasMuted = false;
+    bool wasVideoMuted = false;
     for (int i = 0; i < _temp.length; i++) {
       if (_temp.elementAt(i).uid == uid) {
+        if (_temp.elementAt(i).muted) {
+          wasMuted = true;
+        }
+        if (_temp.elementAt(i).videoDisabled) {
+          wasVideoMuted = true;
+        }
         _temp.remove(_temp.elementAt(i));
       }
     }
@@ -102,7 +114,14 @@ class DirectorController extends StateNotifier<DirectorModel> {
         uid: uid,
       )
     });
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+    if (!wasMuted) {
+      state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+    }
+    if (!wasVideoMuted) {
+      state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
+    }
+
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
   }
 
   Future<void> removeUser({required int uid}) async {
