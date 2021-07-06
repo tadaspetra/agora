@@ -71,9 +71,18 @@ class _BroadcastPageState extends State<BroadcastPage> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: directorData.activeUsers.elementAt(index).videoDisabled
-                                  ? Container(
-                                      color: Colors.black,
-                                    )
+                                  ? Stack(children: [
+                                      Container(
+                                        color: Colors.black,
+                                      ),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Video Off",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ])
                                   : RtcRemoteView.SurfaceView(
                                       uid: directorData.activeUsers.elementAt(index).uid,
                                     ),
@@ -138,9 +147,18 @@ class _BroadcastPageState extends State<BroadcastPage> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: directorData.lobbyUsers.elementAt(index).videoDisabled
-                                  ? Container(
-                                      color: Colors.black,
-                                    )
+                                  ? Stack(children: [
+                                      Container(
+                                        color: Colors.black,
+                                      ),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Video Off",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ])
                                   : RtcRemoteView.SurfaceView(
                                       uid: directorData.lobbyUsers.elementAt(index).uid,
                                     ),
@@ -181,13 +199,13 @@ class _BroadcastPageState extends State<BroadcastPage> {
                   directorData.isLive
                       ? ElevatedButton(
                           onPressed: () {
-                            throw (UnimplementedError);
+                            directorNotifier.endStream();
                           },
                           child: Text("End Livestream"),
                         )
                       : ElevatedButton(
                           onPressed: () {
-                            throw (UnimplementedError);
+                            directorNotifier.startStream();
                           },
                           child: Text("Start Livestream"),
                         ),

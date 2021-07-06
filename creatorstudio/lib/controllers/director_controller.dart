@@ -142,17 +142,24 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   Future<void> startStream() async {
     List<TranscodingUser> transcodingUsers = [];
-    for (int i = 0; i < state.activeUsers.length; i++) {
-      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(i).uid, 0, 0));
+    if (state.activeUsers.isEmpty) {
+    } else if (state.activeUsers.length == 1) {
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 400, height: 400, zOrder: 1, alpha: 1));
+    } else if (state.activeUsers.length == 2) {
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 400, height: 400, zOrder: 1, alpha: 1));
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(1).uid, 400, 400, width: 400, height: 400, zOrder: 1, alpha: 1));
     }
+
     LiveTranscoding transcoding = LiveTranscoding(
       transcodingUsers,
     );
     state.engine?.setLiveTranscoding(transcoding);
-    state.engine?.addPublishStreamUrl("url", true);
+    state.engine?.addPublishStreamUrl("rtmp://a.rtmp.youtube.com/live2/6fkt-6ecx-0rhm-1gat-58zv", true);
+    state = state.copyWith(isLive: true);
   }
 
   Future<void> endStream() async {
-    state.engine?.removePublishStreamUrl("url");
+    state.engine?.removePublishStreamUrl("rtmp://a.rtmp.youtube.com/live2/6fkt-6ecx-0rhm-1gat-58zv");
+    state = state.copyWith(isLive: false);
   }
 }
