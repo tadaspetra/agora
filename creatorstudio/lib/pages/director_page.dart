@@ -1,12 +1,7 @@
 import 'package:creatorstudio/controllers/director_controller.dart';
 import 'package:creatorstudio/models/director_model.dart';
-import 'package:creatorstudio/utils/appId.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-import 'package:creatorstudio/message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BroadcastPage extends StatefulWidget {
@@ -22,10 +17,54 @@ class BroadcastPage extends StatefulWidget {
 }
 
 class _BroadcastPageState extends State<BroadcastPage> {
+  String? streamUrl;
+
   @override
   void initState() {
     context.read(directorController.notifier).joinCall(channel: widget.channelName);
     super.initState();
+  }
+
+  Future<Widget?> streamDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 500),
+          child: StatefulBuilder(
+            builder: (BuildContext context, void Function(void Function()) setState) {
+              TextEditingController urlController = TextEditingController();
+              TextEditingController keyController = TextEditingController();
+              return Scaffold(
+                resizeToAvoidBottomInset: false,
+                body: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(hintText: "Stream URL"),
+                        controller: urlController,
+                      ),
+                      TextField(
+                        decoration: InputDecoration(hintText: "Stream Key"),
+                        controller: keyController,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          streamUrl = urlController.text.trim() + "/" + keyController.text.trim();
+                          Navigator.pop(context);
+                        },
+                        child: Text("Save Destination"),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -46,12 +85,20 @@ class _BroadcastPageState extends State<BroadcastPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          child: Text("Add Stream Destination"),
-                          onPressed: () {
-                            throw (UnimplementedError);
-                          },
-                        ),
+                        streamUrl == null
+                            ? TextButton(
+                                child: Text("Add Stream Destination"),
+                                onPressed: () async {
+                                  await streamDialog(context);
+                                },
+                              )
+                            : TextButton(
+                                onPressed: () {
+                                  streamUrl = null;
+                                  setState(() {});
+                                },
+                                child: Text("Clear Stream Destination"),
+                              )
                       ],
                     ),
                   )
@@ -199,13 +246,21 @@ class _BroadcastPageState extends State<BroadcastPage> {
                   directorData.isLive
                       ? ElevatedButton(
                           onPressed: () {
-                            directorNotifier.endStream();
+                            if (streamUrl != null) {
+                              directorNotifier.endStream(streamUrl!);
+                            } else {
+                              throw ("Invalid URL");
+                            }
                           },
                           child: Text("End Livestream"),
                         )
                       : ElevatedButton(
                           onPressed: () {
-                            directorNotifier.startStream();
+                            if (streamUrl != null) {
+                              directorNotifier.startStream(streamUrl!);
+                            } else {
+                              throw ("Invalid URL");
+                            }
                           },
                           child: Text("Start Livestream"),
                         ),

@@ -2,7 +2,7 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:creatorstudio/message.dart';
 import 'package:creatorstudio/models/director_model.dart';
 import 'package:creatorstudio/models/user.dart';
-import 'package:creatorstudio/utils/appId.dart';
+import 'package:creatorstudio/utils/app_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../rtc_repo.dart';
@@ -72,6 +72,7 @@ class DirectorController extends StateNotifier<DirectorModel> {
       )
     });
     state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
+    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
     state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
   }
 
@@ -140,26 +141,29 @@ class DirectorController extends StateNotifier<DirectorModel> {
     state = state.copyWith(activeUsers: _temp, lobbyUsers: _tempLobby);
   }
 
-  Future<void> startStream() async {
+  Future<void> startStream(String url) async {
     List<TranscodingUser> transcodingUsers = [];
     if (state.activeUsers.isEmpty) {
     } else if (state.activeUsers.length == 1) {
       transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 400, height: 400, zOrder: 1, alpha: 1));
     } else if (state.activeUsers.length == 2) {
-      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 400, height: 400, zOrder: 1, alpha: 1));
-      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(1).uid, 400, 400, width: 400, height: 400, zOrder: 1, alpha: 1));
+      print("USERS: " + state.activeUsers.elementAt(0).uid.toString() + " AND " + state.activeUsers.elementAt(1).uid.toString());
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 960, height: 1080));
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(1).uid, 960, 0, width: 960, height: 1080));
     }
 
     LiveTranscoding transcoding = LiveTranscoding(
       transcodingUsers,
+      width: 1920,
+      height: 1080,
     );
     state.engine?.setLiveTranscoding(transcoding);
-    state.engine?.addPublishStreamUrl("rtmp://a.rtmp.youtube.com/live2/6fkt-6ecx-0rhm-1gat-58zv", true);
+    state.engine?.addPublishStreamUrl(url, true);
     state = state.copyWith(isLive: true);
   }
 
-  Future<void> endStream() async {
-    state.engine?.removePublishStreamUrl("rtmp://a.rtmp.youtube.com/live2/6fkt-6ecx-0rhm-1gat-58zv");
+  Future<void> endStream(String url) async {
+    state.engine?.removePublishStreamUrl(url);
     state = state.copyWith(isLive: false);
   }
 }

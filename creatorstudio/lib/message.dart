@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:creatorstudio/models/user.dart';
 
 class Message {

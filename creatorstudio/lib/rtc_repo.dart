@@ -21,6 +21,7 @@ class RtcRepo {
           },
           leaveChannel: (stats) {},
           userJoined: (uid, elapsed) {
+            print("USER JOINED " + uid.toString());
             read(directorController.notifier).addUserToLobby(uid: uid);
           },
           userOffline: (uid, reason) {

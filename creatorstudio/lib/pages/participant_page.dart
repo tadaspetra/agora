@@ -1,5 +1,5 @@
 import 'package:creatorstudio/message.dart';
-import 'package:creatorstudio/utils/appId.dart';
+import 'package:creatorstudio/utils/app_id.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
