@@ -113,6 +113,8 @@ class DirectorController extends StateNotifier<DirectorModel> {
       ...state.lobbyUsers,
       AgoraUser(
         uid: uid,
+        videoDisabled: true,
+        muted: true,
       )
     });
     if (!wasMuted) {

@@ -105,6 +105,19 @@ class _BroadcastPageState extends State<BroadcastPage> {
                 ],
               ),
             ),
+            if (directorData.activeUsers.isEmpty)
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    Center(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Text("Empty Stage"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             SliverGrid(
               gridDelegate:
                   SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: size.width / 2, crossAxisSpacing: 20, mainAxisSpacing: 20),
@@ -181,6 +194,19 @@ class _BroadcastPageState extends State<BroadcastPage> {
                 ],
               ),
             ),
+            if (directorData.lobbyUsers.isEmpty)
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    Center(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Text("Empty Lobby"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             SliverGrid(
               gridDelegate:
                   SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: size.width / 2, crossAxisSpacing: 20, mainAxisSpacing: 20),
