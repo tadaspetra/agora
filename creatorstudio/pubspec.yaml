@@ -24,10 +24,12 @@ dependencies:
   flutter:
     sdk: flutter
   agora_rtc_engine: ^4.0.2
+  agora_rtm: ^1.0.0-rc.1
   cupertino_icons: ^1.0.2
   flutter_riverpod: ^0.14.0+3
   lints: ^1.0.1
   permission_handler: ^8.1.1
+  shared_preferences: ^2.0.6
 
 dev_dependencies:
   flutter_test:

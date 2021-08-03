@@ -1,4 +1,5 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtm/agora_rtm.dart';
 import 'package:creatorstudio/controllers/director_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,7 +10,7 @@ class RtcRepo {
   Reader read;
   RtcRepo(this.read);
 
-  Future<void> joinCallAsDirector(RtcEngine engine, String channel) async {
+  Future<AgoraRtmChannel?> joinCallAsDirector(RtcEngine engine, AgoraRtmClient client, String channelName, int uid) async {
     await [Permission.camera, Permission.microphone].request();
     engine.setEventHandler(
       RtcEngineEventHandler(
@@ -17,7 +18,7 @@ class RtcRepo {
             print(code);
           },
           joinChannelSuccess: (channel, uid, elapsed) {
-            print("DIRECTOR");
+            print("DIRECTOR $uid");
           },
           leaveChannel: (stats) {},
           userJoined: (uid, elapsed) {
@@ -58,6 +59,33 @@ class RtcRepo {
     engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     engine.setClientRole(ClientRole.Broadcaster);
     engine.enableVideo();
-    engine.joinChannel(null, channel, null, 0);
+
+    client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
+      print("Private Message from " + peerId + ": " + (message.text ?? "null"));
+    };
+    client.onConnectionStateChanged = (int state, int reason) {
+      print('Connection state changed: ' + state.toString() + ', reason: ' + reason.toString());
+      if (state == 5) {
+        client.logout();
+        print('Logout.');
+      }
+    };
+
+    //join channels
+    client.login(null, uid.toString());
+    AgoraRtmChannel? _channel = await client.createChannel(channelName);
+    _channel?.join();
+    engine.joinChannel(null, channelName, null, uid);
+
+    _channel?.onMemberJoined = (AgoraRtmMember member) {
+      print("Member joined: " + member.userId + ', channel: ' + member.channelId);
+    };
+    _channel?.onMemberLeft = (AgoraRtmMember member) {
+      print("Member left: " + member.userId + ', channel: ' + member.channelId);
+    };
+    _channel?.onMessageReceived = (AgoraRtmMessage message, AgoraRtmMember member) {
+      print("Public Message from " + member.userId + ": " + (message.text ?? "null"));
+    };
+    return _channel;
   }
 }

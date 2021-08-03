@@ -2,6 +2,7 @@ import 'package:creatorstudio/pages/director_page.dart';
 import 'package:creatorstudio/pages/participant_page.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -11,6 +12,28 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _channelName = TextEditingController();
   String check = '';
+  late int uid;
+
+  @override
+  void initState() {
+    getUserUid();
+    super.initState();
+  }
+
+  Future<void> getUserUid() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    int? storedUid = preferences.getInt("localUid");
+    if (storedUid != null) {
+      uid = storedUid;
+      print("storedUID: $uid");
+    } else {
+      //should only happen once, unless they delete the app
+      int time = DateTime.now().millisecondsSinceEpoch;
+      uid = int.parse(time.toString().substring(1, time.toString().length - 3));
+      preferences.setInt("localUid", uid);
+      print("settingUID: $uid");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) => BroadcastPage(
           channelName: _channelName.text,
+          uid: uid,
         ),
       ),
     );
@@ -89,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) => ParticipantPage(
           channelName: _channelName.text,
+          uid: uid,
         ),
       ),
     );

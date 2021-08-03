@@ -1,4 +1,5 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtm/agora_rtm.dart';
 import 'package:creatorstudio/message.dart';
 import 'package:creatorstudio/models/director_model.dart';
 import 'package:creatorstudio/models/user.dart';
@@ -16,24 +17,34 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   DirectorController(this.read) : super(DirectorModel());
 
-  Future<void> _initializeEngine() async {
+  Future<void> _initialize() async {
     RtcEngine _engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
-    state = DirectorModel(engine: _engine);
+    AgoraRtmClient? _client = await AgoraRtmClient.createInstance(appId);
+    state = DirectorModel(engine: _engine, client: _client);
   }
 
-  Future<void> joinCall({required String channel}) async {
-    await _initializeEngine();
-    state = state.copyWith(streamId: await state.engine?.createDataStream(false, false));
-    read(rtcRepoProvider).joinCallAsDirector(state.engine!, channel);
+  Future<void> joinCall({required String channelName, required int uid}) async {
+    await _initialize();
+    AgoraRtmChannel? _channel = await read(rtcRepoProvider).joinCallAsDirector(state.engine!, state.client!, channelName, uid);
+    state = DirectorModel(
+      channel: _channel,
+    );
   }
 
   Future<void> leaveCall() async {
+    state.channel?.leave();
+    state.client?.logout();
+    state.client?.destroy();
     state.engine?.leaveChannel();
     state.engine?.destroy();
   }
 
-  Future<void> toggleUserAudio({required int index}) async {
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: state.activeUsers.elementAt(index).uid));
+  Future<void> toggleUserAudio({required int index, required bool muted}) async {
+    if (muted) {
+      state.channel?.sendMessage(AgoraRtmMessage.fromText("unmute ${state.activeUsers.elementAt(index).uid}"));
+    } else {
+      state.channel?.sendMessage(AgoraRtmMessage.fromText("mute ${state.activeUsers.elementAt(index).uid}"));
+    }
   }
 
   Future<void> updateUserAudio({required int uid, required bool muted}) async {
@@ -48,8 +59,12 @@ class DirectorController extends StateNotifier<DirectorModel> {
     }
   }
 
-  Future<void> toggleUserVideo({required int index}) async {
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: state.activeUsers.elementAt(index).uid));
+  Future<void> toggleUserVideo({required int index, required bool enable}) async {
+    if (enable) {
+      state.channel?.sendMessage(AgoraRtmMessage.fromText("disable ${state.activeUsers.elementAt(index).uid}"));
+    } else {
+      state.channel?.sendMessage(AgoraRtmMessage.fromText("enable ${state.activeUsers.elementAt(index).uid}"));
+    }
   }
 
   Future<void> updateUserVideo({required int uid, required bool videoDisabled}) async {
@@ -69,11 +84,11 @@ class DirectorController extends StateNotifier<DirectorModel> {
       ...state.lobbyUsers,
       AgoraUser(
         uid: uid,
+        muted: true,
+        videoDisabled: true,
       )
     });
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
   }
 
   Future<void> promoteToActiveUser({required int uid}) async {
@@ -89,23 +104,15 @@ class DirectorController extends StateNotifier<DirectorModel> {
         uid: uid,
       )
     }, lobbyUsers: _tempLobby);
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText("unmute $uid"));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText("enable $uid"));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
   }
 
   Future<void> demoteToLobbyUser({required int uid}) async {
     Set<AgoraUser> _temp = state.activeUsers;
-    bool wasMuted = false;
-    bool wasVideoMuted = false;
     for (int i = 0; i < _temp.length; i++) {
       if (_temp.elementAt(i).uid == uid) {
-        if (_temp.elementAt(i).muted) {
-          wasMuted = true;
-        }
-        if (_temp.elementAt(i).videoDisabled) {
-          wasVideoMuted = true;
-        }
         _temp.remove(_temp.elementAt(i));
       }
     }
@@ -117,14 +124,9 @@ class DirectorController extends StateNotifier<DirectorModel> {
         muted: true,
       )
     });
-    if (!wasMuted) {
-      state.engine?.sendStreamMessage(state.streamId!, Message().sendMuteMessage(uid: uid));
-    }
-    if (!wasVideoMuted) {
-      state.engine?.sendStreamMessage(state.streamId!, Message().sendDisableVideoMessage(uid: uid));
-    }
-
-    state.engine?.sendStreamMessage(state.streamId!, Message().sendActiveUsers(activeUsers: state.activeUsers));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText("mute $uid"));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText("disable $uid"));
+    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
   }
 
   Future<void> removeUser({required int uid}) async {

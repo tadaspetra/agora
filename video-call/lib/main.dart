@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-
-const appId = "bdda54611dd04c488495c680bada9079";
-const token = "006bdda54611dd04c488495c680bada9079IAAPZqpfzHFc3kCwyeRr89xkdDLFzcEPlEXaJu4pqEZXzNzDPrsAAAAAEAALtir+NEOUYAEAAQA0Q5Rg";
 
 void main() => runApp(MaterialApp(home: MyApp()));
 
@@ -18,24 +14,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _remoteUid;
-  RtcEngine _engine;
+  int? _remoteUid;
+  late RtcEngine _engine;
 
   @override
   void initState() {
     super.initState();
-    initForAgora();
+    initAgora();
   }
 
-  Future<void> initForAgora() async {
+  Future<void> initAgora() async {
     // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
 
     //create the engine
-    _engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
-
+    _engine = await RtcEngine.create("eea35a29e63640c58179685ee868a8d5");
     await _engine.enableVideo();
-
     _engine.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String channel, int uid, int elapsed) {
@@ -56,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    await _engine.joinChannel(token, "firstchannel", null, 0);
+    await _engine.joinChannel(null, "firstchannel", null, 0);
   }
 
   // Create UI with local view and remote view
@@ -69,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       body: Stack(
         children: [
           Center(
-            child: _renderRemoteVideo(),
+            child: _remoteVideo(),
           ),
           Align(
             alignment: Alignment.topLeft,
@@ -77,7 +71,7 @@ class _MyAppState extends State<MyApp> {
               width: 100,
               height: 100,
               child: Center(
-                child: _renderLocalPreview(),
+                child: RtcLocalView.SurfaceView(),
               ),
             ),
           ),
@@ -86,15 +80,10 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  // current user video
-  Widget _renderLocalPreview() {
-    return RtcLocalView.SurfaceView();
-  }
-
-  // remote user video
-  Widget _renderRemoteVideo() {
+  // Display remote user's video
+  Widget _remoteVideo() {
     if (_remoteUid != null) {
-      return RtcRemoteView.SurfaceView(uid: _remoteUid);
+      return RtcRemoteView.SurfaceView(uid: _remoteUid!);
     } else {
       return Text(
         'Please wait for remote user to join',

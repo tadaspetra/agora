@@ -6,7 +6,9 @@ INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/androi
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml:1:1-41:12
 MERGED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml:1:1-41:12
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-23:12
+MERGED from [:shared_preferences] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/shared_preferences/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:permission_handler] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/permission_handler/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-11:12
 MERGED from [com.github.agorabuilder:native-full-sdk:3.4.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/d8cc33248ab5a9d94c093ce0cf11ff84/jetified-native-full-sdk-3.4.2/AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.fragment:fragment:1.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/2fd9120a6da4df3dbabdd40f6a2d8995/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/eb26273f8f7192460456ce62b9bdf9ef/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -21,6 +23,7 @@ MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /Users/tadaspetra
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/96aee308bccd03bc62c306516c23a410/versionedparcelable-1.1.0/AndroidManifest.xml:17:1-27:12
 MERGED from [androidx.arch.core:core-runtime:2.0.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/5f606c30f064eed94124828de37fadc0/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/15792e6083b2b5b5a7ffa285d47daa24/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:17:1-22:12
+MERGED from [io.agora.rtm:rtm-sdk:1.2.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/bbef1bb8104ddf8bdabe82fc0ef9a83e/jetified-rtm-sdk-1.2.2/AndroidManifest.xml:2:1-11:12
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml:1:1-7:12
@@ -98,8 +101,12 @@ INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/androi
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/main/AndroidManifest.xml
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:6:5-8:41
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:6:5-8:41
+MERGED from [:shared_preferences] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/shared_preferences/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:shared_preferences] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/shared_preferences/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:permission_handler] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/permission_handler/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:permission_handler] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/permission_handler/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [com.github.agorabuilder:native-full-sdk:3.4.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/d8cc33248ab5a9d94c093ce0cf11ff84/jetified-native-full-sdk-3.4.2/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.agorabuilder:native-full-sdk:3.4.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/d8cc33248ab5a9d94c093ce0cf11ff84/jetified-native-full-sdk-3.4.2/AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.fragment:fragment:1.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/2fd9120a6da4df3dbabdd40f6a2d8995/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
@@ -128,6 +135,8 @@ MERGED from [androidx.arch.core:core-runtime:2.0.0] /Users/tadaspetraitis/.gradl
 MERGED from [androidx.arch.core:core-runtime:2.0.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/5f606c30f064eed94124828de37fadc0/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/15792e6083b2b5b5a7ffa285d47daa24/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/15792e6083b2b5b5a7ffa285d47daa24/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
+MERGED from [io.agora.rtm:rtm-sdk:1.2.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/bbef1bb8104ddf8bdabe82fc0ef9a83e/jetified-rtm-sdk-1.2.2/AndroidManifest.xml:7:5-9:41
+MERGED from [io.agora.rtm:rtm-sdk:1.2.2] /Users/tadaspetraitis/.gradle/caches/transforms-2/files-2.1/bbef1bb8104ddf8bdabe82fc0ef9a83e/jetified-rtm-sdk-1.2.2/AndroidManifest.xml:7:5-9:41
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml
 INJECTED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml
 	android:targetSdkVersion
@@ -140,6 +149,8 @@ uses-permission#android.permission.INTERNET
 ADDED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml:6:5-66
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:11:5-67
 MERGED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:11:5-67
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:7:5-67
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:7:5-67
 	android:name
 		ADDED from /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/android/app/src/debug/AndroidManifest.xml:6:22-64
 uses-permission#android.permission.READ_PHONE_STATE
@@ -160,6 +171,8 @@ ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/cre
 		ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:14:22-77
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:15:5-79
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:8:5-79
+MERGED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:8:5-79
 	android:name
 		ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:15:22-76
 uses-permission#android.permission.BLUETOOTH
@@ -180,3 +193,7 @@ ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/cre
 		ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:21:9-44
 	android:name
 		ADDED from [:agora_rtc_engine] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtc_engine/intermediates/library_manifest/debug/AndroidManifest.xml:20:9-70
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:9:5-81
+	android:name
+		ADDED from [:agora_rtm] /Users/tadaspetraitis/tadaspetra/github/agora/creatorstudio/build/agora_rtm/intermediates/library_manifest/debug/AndroidManifest.xml:9:22-78

@@ -6,10 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BroadcastPage extends StatefulWidget {
   final String channelName;
+  final int uid;
 
   const BroadcastPage({
     Key? key,
     required this.channelName,
+    required this.uid,
   }) : super(key: key);
 
   @override
@@ -21,7 +23,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
 
   @override
   void initState() {
-    context.read(directorController.notifier).joinCall(channel: widget.channelName);
+    context.read(directorController.notifier).joinCall(channelName: widget.channelName, uid: widget.uid);
     super.initState();
   }
 
@@ -153,12 +155,24 @@ class _BroadcastPageState extends State<BroadcastPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    onPressed: () => directorNotifier.toggleUserAudio(index: index),
+                                    onPressed: () {
+                                      if (directorData.activeUsers.elementAt(index).muted) {
+                                        directorNotifier.toggleUserAudio(index: index, muted: true);
+                                      } else {
+                                        directorNotifier.toggleUserAudio(index: index, muted: false);
+                                      }
+                                    },
                                     icon: Icon(Icons.mic_off),
                                     color: directorData.activeUsers.elementAt(index).muted ? Colors.red : Colors.white,
                                   ),
                                   IconButton(
-                                    onPressed: () => directorNotifier.toggleUserVideo(index: index),
+                                    onPressed: () {
+                                      if (directorData.activeUsers.elementAt(index).videoDisabled) {
+                                        directorNotifier.toggleUserVideo(index: index, enable: false);
+                                      } else {
+                                        directorNotifier.toggleUserVideo(index: index, enable: true);
+                                      }
+                                    },
                                     icon: Icon(Icons.videocam_off),
                                     color: directorData.activeUsers.elementAt(index).videoDisabled ? Colors.red : Colors.white,
                                   ),

@@ -1,3 +1,4 @@
+import 'package:agora_rtm/agora_rtm.dart';
 import 'package:creatorstudio/message.dart';
 import 'package:creatorstudio/utils/app_id.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +9,12 @@ import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
 class ParticipantPage extends StatefulWidget {
   final String channelName;
+  final int uid;
 
   const ParticipantPage({
     Key? key,
     required this.channelName,
+    required this.uid,
   }) : super(key: key);
 
   @override
@@ -21,18 +24,20 @@ class ParticipantPage extends StatefulWidget {
 class _BroadcastPageState extends State<ParticipantPage> {
   List<int> _users = <int>[];
   late RtcEngine _engine;
+  AgoraRtmClient? _client;
+  AgoraRtmChannel? _channel;
   bool muted = false;
   bool videoDisabled = false;
-  int? streamId;
-  int? localUid;
   bool activeUser = false;
 
   @override
   void dispose() {
-    // clear users
+    _channel?.leave();
+    _client?.logout();
+    _client?.destroy();
     _users.clear();
-    // destroy sdk and leave channel
     _engine.destroy();
+
     super.dispose();
   }
 
@@ -44,14 +49,16 @@ class _BroadcastPageState extends State<ParticipantPage> {
   }
 
   Future<void> initializeAgora() async {
-    await _initAgoraRtcEngine();
+    await _initAgora();
 
     _engine.setEventHandler(RtcEngineEventHandler(
       joinChannelSuccess: (channel, uid, elapsed) {
         setState(() {
           print('onJoinChannel: $channel, uid: $uid');
         });
-        localUid = uid;
+        if (widget.uid != uid) {
+          throw ("How can this happen?!?");
+        }
       },
       leaveChannel: (stats) {
         setState(() {
@@ -72,35 +79,84 @@ class _BroadcastPageState extends State<ParticipantPage> {
           //_users.remove(uid);
         });
       },
-      streamMessage: (_, __, message) {
-        setState(() {
-          List<String> parsedMessage = message.split(" ");
-          if (message == "audio " + localUid.toString()) {
-            _onToggleMute();
-          } else if (message == "video " + localUid.toString()) {
-            _onToggleVideoDisabled();
-          } else if (parsedMessage[0] == "activeUsers") {
-            _users = Message().parseActiveUsers(uids: parsedMessage[1]);
-          }
-        });
-        final String info = "here is the message $message";
-        print(info);
-      },
-      streamMessageError: (_, __, error, ___, ____) {
-        final String info = "here is the error $error";
-        print(info);
-      },
     ));
 
-    await _engine.joinChannel(null, widget.channelName, null, 0);
+    _client?.onMessageReceived = (AgoraRtmMessage message, String peerId) {
+      print("Private Message from " + peerId + ": " + (message.text ?? "null"));
+    };
+    _client?.onConnectionStateChanged = (int state, int reason) {
+      print('Connection state changed: ' + state.toString() + ', reason: ' + reason.toString());
+      if (state == 5) {
+        _channel?.leave();
+        _client?.logout();
+        _client?.destroy();
+        print('Logout.');
+      }
+    };
+    await _client?.login(null, widget.uid.toString());
+    _channel = await _client?.createChannel(widget.channelName);
+    await _channel?.join();
+    print("UID when joining int ${widget.uid} and string ${widget.uid.toString()}");
+    await _engine.joinChannel(null, widget.channelName, null, widget.uid, ChannelMediaOptions(false, false));
+
+    _channel?.onMemberJoined = (AgoraRtmMember member) {
+      print("Member joined: " + member.userId + ', channel: ' + member.channelId);
+    };
+    _channel?.onMemberLeft = (AgoraRtmMember member) {
+      print("Member left: " + member.userId + ', channel: ' + member.channelId);
+    };
+    _channel?.onMessageReceived = (AgoraRtmMessage message, AgoraRtmMember member) {
+      List<String> parsedMessage = message.text!.split(" ");
+      switch (parsedMessage[0]) {
+        case "mute":
+          if (parsedMessage[1] == widget.uid.toString()) {
+            setState(() {
+              muted = true;
+            });
+            _engine.muteLocalAudioStream(true);
+          }
+          break;
+        case "unmute":
+          if (parsedMessage[1] == widget.uid.toString()) {
+            setState(() {
+              muted = false;
+            });
+            _engine.muteLocalAudioStream(false);
+          }
+          break;
+        case "disable":
+          if (parsedMessage[1] == widget.uid.toString()) {
+            setState(() {
+              videoDisabled = true;
+            });
+            _engine.muteLocalVideoStream(true);
+          }
+          break;
+        case "enable":
+          if (parsedMessage[1] == widget.uid.toString()) {
+            setState(() {
+              videoDisabled = false;
+            });
+            _engine.muteLocalVideoStream(false);
+          }
+          break;
+        case "activeUsers":
+          _users = Message().parseActiveUsers(uids: parsedMessage[1]);
+          break;
+        default:
+      }
+      print("Public Message from " + member.userId + ": " + (message.text ?? "null"));
+    };
   }
 
-  Future<void> _initAgoraRtcEngine() async {
+  Future<void> _initAgora() async {
     _engine = await RtcEngine.createWithConfig(RtcEngineConfig(appId));
+    _client = await AgoraRtmClient.createInstance(appId);
+
     await _engine.enableVideo();
-
+    await _engine.muteLocalAudioStream(true);
+    await _engine.muteLocalVideoStream(true);
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-
     await _engine.setClientRole(ClientRole.Broadcaster);
   }
 
@@ -189,7 +245,7 @@ class _BroadcastPageState extends State<ParticipantPage> {
     final List<StatefulWidget> list = [];
     bool checkIfLocalActive = false;
     for (int i = 0; i < _users.length; i++) {
-      if (_users[i] == localUid) {
+      if (_users[i] == widget.uid) {
         list.add(RtcLocalView.SurfaceView());
         checkIfLocalActive = true;
       } else {

@@ -1,12 +1,20 @@
 import 'package:creatorstudio/models/user.dart';
 
 class Message {
-  String sendMuteMessage({required int uid}) {
-    return "audio $uid";
+  String sendMuteMessage({required int uid, required bool mute}) {
+    if (mute) {
+      return "mute $uid";
+    } else {
+      return "unmute $uid";
+    }
   }
 
-  String sendDisableVideoMessage({required int uid}) {
-    return "video $uid";
+  String sendDisableVideoMessage({required int uid, required bool enable}) {
+    if (enable) {
+      return "enable $uid";
+    } else {
+      return "disable $uid";
+    }
   }
 
   String sendActiveUsers({required Set<AgoraUser> activeUsers}) {
