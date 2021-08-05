@@ -2,6 +2,7 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:creatorstudio/message.dart';
 import 'package:creatorstudio/models/director_model.dart';
+import 'package:creatorstudio/models/stream.dart';
 import 'package:creatorstudio/models/user.dart';
 import 'package:creatorstudio/utils/app_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,7 +146,7 @@ class DirectorController extends StateNotifier<DirectorModel> {
     state = state.copyWith(activeUsers: _temp, lobbyUsers: _tempLobby);
   }
 
-  Future<void> startStream(String url) async {
+  Future<void> startStream() async {
     List<TranscodingUser> transcodingUsers = [];
     if (state.activeUsers.isEmpty) {
     } else if (state.activeUsers.length == 1) {
@@ -162,12 +163,39 @@ class DirectorController extends StateNotifier<DirectorModel> {
       height: 1080,
     );
     state.engine?.setLiveTranscoding(transcoding);
-    state.engine?.addPublishStreamUrl(url, true);
+    for (int i = 0; i < state.destinations.length; i++) {
+      print("STREAMING TO: ${state.destinations[i].url}");
+      state.engine?.addPublishStreamUrl(state.destinations[i].url, true);
+    }
+
     state = state.copyWith(isLive: true);
   }
 
-  Future<void> endStream(String url) async {
-    state.engine?.removePublishStreamUrl(url);
+  Future<void> endStream() async {
+    for (int i = 0; i < state.destinations.length; i++) {
+      state.engine?.removePublishStreamUrl(state.destinations[i].url);
+    }
     state = state.copyWith(isLive: false);
+  }
+
+  Future<void> addPublishDestination(StreamPlatform platform, String url) async {
+    if (state.isLive) {
+      state.engine?.addPublishStreamUrl(url, true);
+    }
+    state = state.copyWith(destinations: [...state.destinations, StreamDestination(platform: platform, url: url)]);
+  }
+
+  Future<void> removePublishDestination(String url) async {
+    if (state.isLive) {
+      state.engine?.removePublishStreamUrl(url);
+    }
+    List<StreamDestination> temp = state.destinations;
+    for (int i = 0; i < temp.length; i++) {
+      if (temp[i].url == url) {
+        temp.removeAt(i);
+        return;
+      }
+    }
+    state = state.copyWith(destinations: temp);
   }
 }

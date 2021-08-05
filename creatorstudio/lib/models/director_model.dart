@@ -1,6 +1,7 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtm/agora_rtm.dart';
 
+import 'package:creatorstudio/models/stream.dart';
 import 'package:creatorstudio/models/user.dart';
 
 class DirectorModel {
@@ -11,6 +12,7 @@ class DirectorModel {
   Set<AgoraUser> lobbyUsers;
   AgoraUser? localUser;
   bool isLive;
+  List<StreamDestination> destinations;
 
   DirectorModel({
     this.engine,
@@ -20,6 +22,7 @@ class DirectorModel {
     this.lobbyUsers = const {},
     this.localUser,
     this.isLive = false,
+    this.destinations = const [],
   });
 
   DirectorModel copyWith({
@@ -30,6 +33,7 @@ class DirectorModel {
     Set<AgoraUser>? lobbyUsers,
     AgoraUser? localUser,
     bool? isLive,
+    List<StreamDestination>? destinations,
   }) {
     return DirectorModel(
       engine: engine ?? this.engine,
@@ -39,6 +43,7 @@ class DirectorModel {
       lobbyUsers: lobbyUsers ?? this.lobbyUsers,
       localUser: localUser ?? this.localUser,
       isLive: isLive ?? this.isLive,
+      destinations: destinations ?? this.destinations,
     );
   }
 }
