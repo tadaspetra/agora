@@ -11,6 +11,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _channelName = TextEditingController();
+  final _userName = TextEditingController();
   String check = '';
   late int uid;
 
@@ -45,7 +46,20 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width * 0.85,
-                height: MediaQuery.of(context).size.height * 0.2,
+                child: TextFormField(
+                  controller: _userName,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    hintText: 'User Name',
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.85,
                 child: TextFormField(
                   controller: _channelName,
                   decoration: InputDecoration(
@@ -114,6 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => ParticipantPage(
           channelName: _channelName.text,
           uid: uid,
+          userName: _userName.text,
         ),
       ),
     );

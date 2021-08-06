@@ -5,6 +5,7 @@ import 'package:creatorstudio/models/director_model.dart';
 import 'package:creatorstudio/models/stream.dart';
 import 'package:creatorstudio/models/user.dart';
 import 'package:creatorstudio/utils/app_id.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../rtc_repo.dart';
@@ -28,6 +29,11 @@ class DirectorController extends StateNotifier<DirectorModel> {
     await _initialize();
     AgoraRtmChannel? _channel = await read(rtcRepoProvider).joinCallAsDirector(state.engine!, state.client!, channelName, uid);
     state = state.copyWith(channel: _channel);
+  }
+
+  Future<void> updateUsers({required String message}) async {
+    Set<AgoraUser> newUsers = Message().parseUserInfo(currentUsers: state.lobbyUsers.toList(), userInfo: message).toSet();
+    state = state.copyWith(lobbyUsers: newUsers);
   }
 
   Future<void> leaveCall() async {
@@ -92,8 +98,12 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   Future<void> promoteToActiveUser({required int uid}) async {
     Set<AgoraUser> _tempLobby = state.lobbyUsers;
+    Color? tempColor;
+    String? tempName;
     for (int i = 0; i < _tempLobby.length; i++) {
       if (_tempLobby.elementAt(i).uid == uid) {
+        tempColor = _tempLobby.elementAt(i).backgroundColor;
+        tempName = _tempLobby.elementAt(i).name;
         _tempLobby.remove(_tempLobby.elementAt(i));
       }
     }
@@ -101,6 +111,8 @@ class DirectorController extends StateNotifier<DirectorModel> {
       ...state.activeUsers,
       AgoraUser(
         uid: uid,
+        backgroundColor: tempColor,
+        name: tempName,
       )
     }, lobbyUsers: _tempLobby);
     state.channel!.sendMessage(AgoraRtmMessage.fromText("unmute $uid"));
@@ -114,8 +126,12 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   Future<void> demoteToLobbyUser({required int uid}) async {
     Set<AgoraUser> _temp = state.activeUsers;
+    Color? tempColor;
+    String? tempName;
     for (int i = 0; i < _temp.length; i++) {
       if (_temp.elementAt(i).uid == uid) {
+        tempColor = _temp.elementAt(i).backgroundColor;
+        tempName = _temp.elementAt(i).name;
         _temp.remove(_temp.elementAt(i));
       }
     }
@@ -125,6 +141,8 @@ class DirectorController extends StateNotifier<DirectorModel> {
         uid: uid,
         videoDisabled: true,
         muted: true,
+        backgroundColor: tempColor,
+        name: tempName,
       )
     });
     state.channel!.sendMessage(AgoraRtmMessage.fromText("mute $uid"));

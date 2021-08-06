@@ -90,6 +90,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
             style: TextStyle(color: Colors.white),
           ),
           padding: EdgeInsets.all(8),
+          margin: EdgeInsets.only(right: 4),
         );
       case StreamPlatform.twitch:
         return Container(
@@ -99,6 +100,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
             style: TextStyle(color: Colors.white),
           ),
           padding: EdgeInsets.all(8),
+          margin: EdgeInsets.only(right: 4),
         );
       case StreamPlatform.other:
         return Container(
@@ -108,6 +110,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
             style: TextStyle(color: Colors.white),
           ),
           padding: EdgeInsets.all(8),
+          margin: EdgeInsets.only(right: 4),
         );
       default:
         return Text("Error");
@@ -125,7 +128,8 @@ class _BroadcastPageState extends State<BroadcastPage> {
         padding: const EdgeInsets.all(8.0),
         child: CircularMenu(
           alignment: Alignment.bottomRight,
-          toggleButtonColor: Colors.black,
+          toggleButtonColor: Colors.black87,
+          toggleButtonBoxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
           items: [
             CircularMenuItem(
                 icon: Icons.call_end,
@@ -252,9 +256,22 @@ class _BroadcastPageState extends State<BroadcastPage> {
                                           ),
                                         )
                                       ])
-                                    : RtcRemoteView.SurfaceView(
-                                        uid: directorData.activeUsers.elementAt(index).uid,
-                                      ),
+                                    : Stack(children: [
+                                        RtcRemoteView.SurfaceView(uid: directorData.activeUsers.elementAt(index).uid),
+                                        Align(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(10)),
+                                                color: directorData.activeUsers.elementAt(index).backgroundColor!.withOpacity(1)),
+                                            padding: EdgeInsets.all(16),
+                                            child: Text(
+                                              directorData.activeUsers.elementAt(index).name ?? "name error",
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          ),
+                                          alignment: Alignment.bottomRight,
+                                        ),
+                                      ]),
                               ),
                               Container(
                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.black54),
@@ -343,12 +360,14 @@ class _BroadcastPageState extends State<BroadcastPage> {
                                 child: directorData.lobbyUsers.elementAt(index).videoDisabled
                                     ? Stack(children: [
                                         Container(
-                                          color: Colors.black,
+                                          color: (directorData.lobbyUsers.elementAt(index).backgroundColor != null)
+                                              ? directorData.lobbyUsers.elementAt(index).backgroundColor!.withOpacity(1)
+                                              : Colors.black,
                                         ),
                                         Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            "Video Off",
+                                            directorData.lobbyUsers.elementAt(index).name ?? "error name",
                                             style: TextStyle(color: Colors.white),
                                           ),
                                         )
