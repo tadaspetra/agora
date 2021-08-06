@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     return ProviderScope(
       child: MaterialApp(
         theme: ThemeData(
+          canvasColor: Colors.grey[300],
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
               shape: MaterialStateProperty.all(ContinuousRectangleBorder(
