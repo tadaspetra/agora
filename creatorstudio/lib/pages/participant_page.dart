@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:creatorstudio/message.dart';
+import 'package:creatorstudio/models/user.dart';
 import 'package:creatorstudio/utils/app_id.dart';
 import 'package:flutter/material.dart';
 
@@ -10,11 +13,13 @@ import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 class ParticipantPage extends StatefulWidget {
   final String channelName;
   final int uid;
+  final String userName;
 
   const ParticipantPage({
     Key? key,
     required this.channelName,
     required this.uid,
+    required this.userName,
   }) : super(key: key);
 
   @override
@@ -22,7 +27,7 @@ class ParticipantPage extends StatefulWidget {
 }
 
 class _BroadcastPageState extends State<ParticipantPage> {
-  List<int> _users = <int>[];
+  List<AgoraUser> _users = <AgoraUser>[];
   late RtcEngine _engine;
   AgoraRtmClient? _client;
   AgoraRtmChannel? _channel;
@@ -55,6 +60,11 @@ class _BroadcastPageState extends State<ParticipantPage> {
       joinChannelSuccess: (channel, uid, elapsed) {
         setState(() {
           print('onJoinChannel: $channel, uid: $uid');
+          _channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendUserInfo(
+            uid: uid,
+            name: widget.userName,
+            color: (Random().nextDouble() * 0xFFFFFFFF).toInt(),
+          )));
         });
         if (widget.uid != uid) {
           throw ("How can this happen?!?");
@@ -142,6 +152,11 @@ class _BroadcastPageState extends State<ParticipantPage> {
           break;
         case "activeUsers":
           _users = Message().parseActiveUsers(uids: parsedMessage[1]);
+          setState(() {});
+          break;
+        case "updateUser":
+          _users = Message().parseUserInfo(currentUsers: _users, userInfo: parsedMessage[1]);
+          setState(() {});
           break;
         default:
       }
@@ -242,14 +257,34 @@ class _BroadcastPageState extends State<ParticipantPage> {
 
   /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
-    final List<StatefulWidget> list = [];
+    final List<Widget> list = [];
     bool checkIfLocalActive = false;
     for (int i = 0; i < _users.length; i++) {
-      if (_users[i] == widget.uid) {
-        list.add(RtcLocalView.SurfaceView());
+      if (_users[i].uid == widget.uid) {
+        list.add(Stack(children: [
+          RtcLocalView.SurfaceView(),
+          Align(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10)), color: Colors.white),
+              child: Text(widget.userName),
+            ),
+            alignment: Alignment.bottomRight,
+          ),
+        ]));
         checkIfLocalActive = true;
       } else {
-        list.add(RtcRemoteView.SurfaceView(uid: _users[i]));
+        list.add(Stack(children: [
+          RtcRemoteView.SurfaceView(uid: _users[i].uid),
+          Align(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10)), color: Colors.white),
+              child: Text(_users[i].name ?? "name error"),
+            ),
+            alignment: Alignment.bottomRight,
+          ),
+        ]));
       }
     }
 
