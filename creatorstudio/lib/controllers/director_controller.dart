@@ -27,9 +27,7 @@ class DirectorController extends StateNotifier<DirectorModel> {
   Future<void> joinCall({required String channelName, required int uid}) async {
     await _initialize();
     AgoraRtmChannel? _channel = await read(rtcRepoProvider).joinCallAsDirector(state.engine!, state.client!, channelName, uid);
-    state = DirectorModel(
-      channel: _channel,
-    );
+    state = state.copyWith(channel: _channel);
   }
 
   Future<void> leaveCall() async {
@@ -42,9 +40,9 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   Future<void> toggleUserAudio({required int index, required bool muted}) async {
     if (muted) {
-      state.channel?.sendMessage(AgoraRtmMessage.fromText("unmute ${state.activeUsers.elementAt(index).uid}"));
+      state.channel!.sendMessage(AgoraRtmMessage.fromText("unmute ${state.activeUsers.elementAt(index).uid}"));
     } else {
-      state.channel?.sendMessage(AgoraRtmMessage.fromText("mute ${state.activeUsers.elementAt(index).uid}"));
+      state.channel!.sendMessage(AgoraRtmMessage.fromText("mute ${state.activeUsers.elementAt(index).uid}"));
     }
   }
 
@@ -62,9 +60,9 @@ class DirectorController extends StateNotifier<DirectorModel> {
 
   Future<void> toggleUserVideo({required int index, required bool enable}) async {
     if (enable) {
-      state.channel?.sendMessage(AgoraRtmMessage.fromText("disable ${state.activeUsers.elementAt(index).uid}"));
+      state.channel!.sendMessage(AgoraRtmMessage.fromText("disable ${state.activeUsers.elementAt(index).uid}"));
     } else {
-      state.channel?.sendMessage(AgoraRtmMessage.fromText("enable ${state.activeUsers.elementAt(index).uid}"));
+      state.channel!.sendMessage(AgoraRtmMessage.fromText("enable ${state.activeUsers.elementAt(index).uid}"));
     }
   }
 
@@ -89,7 +87,7 @@ class DirectorController extends StateNotifier<DirectorModel> {
         videoDisabled: true,
       )
     });
-    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
   }
 
   Future<void> promoteToActiveUser({required int uid}) async {
@@ -105,9 +103,13 @@ class DirectorController extends StateNotifier<DirectorModel> {
         uid: uid,
       )
     }, lobbyUsers: _tempLobby);
-    state.channel?.sendMessage(AgoraRtmMessage.fromText("unmute $uid"));
-    state.channel?.sendMessage(AgoraRtmMessage.fromText("enable $uid"));
-    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText("unmute $uid"));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText("enable $uid"));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
+
+    if (state.isLive) {
+      updateStream();
+    }
   }
 
   Future<void> demoteToLobbyUser({required int uid}) async {
@@ -125,9 +127,13 @@ class DirectorController extends StateNotifier<DirectorModel> {
         muted: true,
       )
     });
-    state.channel?.sendMessage(AgoraRtmMessage.fromText("mute $uid"));
-    state.channel?.sendMessage(AgoraRtmMessage.fromText("disable $uid"));
-    state.channel?.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText("mute $uid"));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText("disable $uid"));
+    state.channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));
+
+    if (state.isLive) {
+      updateStream();
+    }
   }
 
   Future<void> removeUser({required int uid}) async {
@@ -144,13 +150,17 @@ class DirectorController extends StateNotifier<DirectorModel> {
       }
     }
     state = state.copyWith(activeUsers: _temp, lobbyUsers: _tempLobby);
+
+    if (state.isLive) {
+      updateStream();
+    }
   }
 
   Future<void> startStream() async {
     List<TranscodingUser> transcodingUsers = [];
     if (state.activeUsers.isEmpty) {
     } else if (state.activeUsers.length == 1) {
-      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 400, height: 400, zOrder: 1, alpha: 1));
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 1920, height: 1080, zOrder: 1, alpha: 1));
     } else if (state.activeUsers.length == 2) {
       print("USERS: " + state.activeUsers.elementAt(0).uid.toString() + " AND " + state.activeUsers.elementAt(1).uid.toString());
       transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 960, height: 1080));
@@ -162,40 +172,59 @@ class DirectorController extends StateNotifier<DirectorModel> {
       width: 1920,
       height: 1080,
     );
-    state.engine?.setLiveTranscoding(transcoding);
+    state.engine!.setLiveTranscoding(transcoding);
     for (int i = 0; i < state.destinations.length; i++) {
       print("STREAMING TO: ${state.destinations[i].url}");
-      state.engine?.addPublishStreamUrl(state.destinations[i].url, true);
+      state.engine!.addPublishStreamUrl(state.destinations[i].url, true);
     }
 
     state = state.copyWith(isLive: true);
   }
 
+  Future<void> updateStream() async {
+    List<TranscodingUser> transcodingUsers = [];
+    if (state.activeUsers.isEmpty) {
+    } else if (state.activeUsers.length == 1) {
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 1920, height: 1080, zOrder: 1, alpha: 1));
+    } else if (state.activeUsers.length == 2) {
+      print("USERS: " + state.activeUsers.elementAt(0).uid.toString() + " AND " + state.activeUsers.elementAt(1).uid.toString());
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(0).uid, 0, 0, width: 960, height: 1080));
+      transcodingUsers.add(TranscodingUser(state.activeUsers.elementAt(1).uid, 960, 0, width: 960, height: 1080));
+    }
+
+    LiveTranscoding transcoding = LiveTranscoding(
+      transcodingUsers,
+      width: 1920,
+      height: 1080,
+    );
+    state.engine!.setLiveTranscoding(transcoding);
+  }
+
   Future<void> endStream() async {
     for (int i = 0; i < state.destinations.length; i++) {
-      state.engine?.removePublishStreamUrl(state.destinations[i].url);
+      state.engine!.removePublishStreamUrl(state.destinations[i].url);
     }
     state = state.copyWith(isLive: false);
   }
 
   Future<void> addPublishDestination(StreamPlatform platform, String url) async {
     if (state.isLive) {
-      state.engine?.addPublishStreamUrl(url, true);
+      state.engine!.addPublishStreamUrl(url, true);
     }
     state = state.copyWith(destinations: [...state.destinations, StreamDestination(platform: platform, url: url)]);
   }
 
   Future<void> removePublishDestination(String url) async {
     if (state.isLive) {
-      state.engine?.removePublishStreamUrl(url);
+      state.engine!.removePublishStreamUrl(url);
     }
     List<StreamDestination> temp = state.destinations;
     for (int i = 0; i < temp.length; i++) {
       if (temp[i].url == url) {
         temp.removeAt(i);
+        state = state.copyWith(destinations: temp);
         return;
       }
     }
-    state = state.copyWith(destinations: temp);
   }
 }

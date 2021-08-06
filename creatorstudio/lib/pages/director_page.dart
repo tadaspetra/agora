@@ -80,6 +80,40 @@ class _BroadcastPageState extends State<BroadcastPage> {
     );
   }
 
+  Widget _deleteButton(StreamDestination destination) {
+    switch (destination.platform) {
+      case StreamPlatform.youtube:
+        return Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.red),
+          child: Text(
+            "Youtube",
+            style: TextStyle(color: Colors.white),
+          ),
+          padding: EdgeInsets.all(8),
+        );
+      case StreamPlatform.twitch:
+        return Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.purple),
+          child: Text(
+            "Twitch",
+            style: TextStyle(color: Colors.white),
+          ),
+          padding: EdgeInsets.all(8),
+        );
+      case StreamPlatform.other:
+        return Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.black),
+          child: Text(
+            "Other",
+            style: TextStyle(color: Colors.white),
+          ),
+          padding: EdgeInsets.all(8),
+        );
+      default:
+        return Text("Error");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
@@ -94,24 +128,31 @@ class _BroadcastPageState extends State<BroadcastPage> {
           toggleButtonColor: Colors.black,
           items: [
             CircularMenuItem(
-                icon: Icons.home,
-                color: Colors.green,
+                icon: Icons.call_end,
+                color: Colors.red,
                 onTap: () {
-                  setState(() {});
+                  directorNotifier.leaveCall();
+                  Navigator.pop(context);
                 }),
-            CircularMenuItem(
-                icon: Icons.search,
-                color: Colors.blue,
-                onTap: () {
-                  setState(() {});
-                }),
-            CircularMenuItem(
-              icon: Icons.settings,
-              color: Colors.orange,
-              onTap: () {
-                setState(() {});
-              },
-            ),
+            directorData.isLive
+                ? CircularMenuItem(
+                    icon: Icons.cancel,
+                    color: Colors.orange,
+                    onTap: () {
+                      directorNotifier.endStream();
+                    },
+                  )
+                : CircularMenuItem(
+                    icon: Icons.videocam,
+                    color: Colors.orange,
+                    onTap: () {
+                      if (directorData.destinations.isNotEmpty) {
+                        directorNotifier.startStream();
+                      } else {
+                        throw ("Invalid URL");
+                      }
+                    },
+                  ),
           ],
           backgroundWidget: CustomScrollView(
             slivers: [
@@ -150,7 +191,23 @@ class _BroadcastPageState extends State<BroadcastPage> {
                             },
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          for (int i = 0; i < directorData.destinations.length; i++) Text(directorData.destinations[i].platform.toString())
+                          for (int i = 0; i < directorData.destinations.length; i++)
+                            PopupMenuButton(
+                              itemBuilder: (context) {
+                                List<PopupMenuEntry<Object>> list = [];
+                                list.add(
+                                    PopupMenuItem(child: ListTile(leading: Icon(Icons.remove), title: Text("Remove Stream")), value: 0));
+                                return list;
+                              },
+                              child: _deleteButton(directorData.destinations[i]),
+                              onCanceled: () {
+                                print("You have canceled the menu");
+                              },
+                              onSelected: (value) {
+                                directorNotifier.removePublishDestination(directorData.destinations[i].url);
+                              },
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
                         ],
                       ),
                     )
@@ -322,36 +379,6 @@ class _BroadcastPageState extends State<BroadcastPage> {
                     ],
                   );
                 }, childCount: directorData.lobbyUsers.length),
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    ElevatedButton(
-                      onPressed: () {
-                        directorNotifier.leaveCall();
-                        Navigator.pop(context);
-                      },
-                      child: Text("Leave Call"),
-                    ),
-                    directorData.isLive
-                        ? ElevatedButton(
-                            onPressed: () {
-                              directorNotifier.endStream();
-                            },
-                            child: Text("End Livestream"),
-                          )
-                        : ElevatedButton(
-                            onPressed: () {
-                              if (directorData.destinations.isNotEmpty) {
-                                directorNotifier.startStream();
-                              } else {
-                                throw ("Invalid URL");
-                              }
-                            },
-                            child: Text("Start Livestream"),
-                          ),
-                  ],
-                ),
               ),
             ],
           ),
