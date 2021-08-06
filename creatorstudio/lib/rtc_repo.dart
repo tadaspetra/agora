@@ -43,17 +43,13 @@ class RtcRepo {
             }
           },
           streamPublished: (url, error) {
-            print(error);
+            print("Stream published to $url");
           },
-          streamUnpublished: (url) {},
-          streamInjectedStatus: (url, uid, status) {
-            print(url);
-          },
-          rtmpStreamingEvent: (url, eventCode) {
-            print(url);
+          streamUnpublished: (url) {
+            print("Stream unpublished from $url");
           },
           rtmpStreamingStateChanged: (url, state, errorCode) {
-            print(url);
+            print("Stream State Changed for $url to state $state");
           }),
     );
     engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
