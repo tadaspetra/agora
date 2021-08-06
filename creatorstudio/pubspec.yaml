@@ -30,6 +30,9 @@ dependencies:
   lints: ^1.0.1
   permission_handler: ^8.1.1
   shared_preferences: ^2.0.6
+  app_popup_menu: ^1.0.0
+  modal_bottom_sheet: ^2.0.0
+  circular_menu: ^1.2.3
 
 dev_dependencies:
   flutter_test:

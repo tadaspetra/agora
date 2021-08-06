@@ -12,6 +12,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp(
+        theme: ThemeData(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all(ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              )),
+              padding: MaterialStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 30),
+              ),
+              backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                return Colors.black;
+              }),
+            ),
+          ),
+        ),
         home: MyHomePage(),
       ),
     );
