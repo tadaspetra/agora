@@ -1,5 +1,4 @@
 import 'package:creatorstudio/models/user.dart';
-import 'package:flutter/material.dart';
 
 class Message {
   String sendMuteMessage({required int uid, required bool mute}) {
@@ -38,20 +37,5 @@ class Message {
     }
     print(users);
     return users;
-  }
-
-  String sendUserInfo({required int uid, required String name, required int color}) {
-    return "updateUser $uid,$name,$color";
-  }
-
-  List<AgoraUser> parseUserInfo({required List<AgoraUser> currentUsers, required String userInfo}) {
-    List<String> information = userInfo.split(","); // uid,name,color
-    List<AgoraUser> tempUser = currentUsers;
-    for (int i = 0; i < tempUser.length; i++) {
-      if (tempUser[i].uid == int.parse(information[0])) {
-        tempUser[i] = tempUser[i].copyWith(name: information[1], backgroundColor: Color(int.parse(information[2])));
-      }
-    }
-    return tempUser;
   }
 }

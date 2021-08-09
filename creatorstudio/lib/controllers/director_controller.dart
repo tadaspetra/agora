@@ -31,11 +31,6 @@ class DirectorController extends StateNotifier<DirectorModel> {
     state = state.copyWith(channel: _channel);
   }
 
-  Future<void> updateUsers({required String message}) async {
-    Set<AgoraUser> newUsers = Message().parseUserInfo(currentUsers: state.lobbyUsers.toList(), userInfo: message).toSet();
-    state = state.copyWith(lobbyUsers: newUsers);
-  }
-
   Future<void> leaveCall() async {
     state.channel?.leave();
     state.client?.logout();
@@ -85,12 +80,15 @@ class DirectorController extends StateNotifier<DirectorModel> {
   }
 
   Future<void> addUserToLobby({required int uid}) async {
+    var userAttributes = await state.client?.getUserAttributes(uid.toString());
     state = state.copyWith(lobbyUsers: {
       ...state.lobbyUsers,
       AgoraUser(
         uid: uid,
         muted: true,
         videoDisabled: true,
+        name: userAttributes?['name'],
+        backgroundColor: Color(int.parse(userAttributes?['color'])),
       )
     });
     state.channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendActiveUsers(activeUsers: state.activeUsers)));

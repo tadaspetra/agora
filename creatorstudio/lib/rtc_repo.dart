@@ -4,8 +4,6 @@ import 'package:creatorstudio/controllers/director_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'message.dart';
-
 final rtcRepoProvider = Provider<RtcRepo>((ref) => RtcRepo(ref.read));
 
 class RtcRepo {
@@ -27,6 +25,7 @@ class RtcRepo {
             print("USER JOINED " + uid.toString());
             read(directorController.notifier).addUserToLobby(uid: uid);
           },
+          userInfoUpdated: (uid, UserInfo info) {},
           userOffline: (uid, reason) {
             read(directorController.notifier).removeUser(uid: uid);
           },
@@ -83,13 +82,13 @@ class RtcRepo {
     };
     _channel?.onMessageReceived = (AgoraRtmMessage message, AgoraRtmMember member) {
       print("Public Message from " + member.userId + ": " + (message.text ?? "null"));
-      List<String> parsedMessage = message.text!.split(" ");
-      switch (parsedMessage[0]) {
-        case "updateUser":
-          read(directorController.notifier).updateUsers(message: parsedMessage[1]);
-          break;
-        default:
-      }
+      // List<String> parsedMessage = message.text!.split(" ");
+      // switch (parsedMessage[0]) {
+      //   case "updateUser":
+      //     read(directorController.notifier).updateUsers(message: parsedMessage[1]);
+      //     break;
+      //   default:
+      // }
     };
     return _channel;
   }

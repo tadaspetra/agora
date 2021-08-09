@@ -60,11 +60,16 @@ class _BroadcastPageState extends State<ParticipantPage> {
       joinChannelSuccess: (channel, uid, elapsed) {
         setState(() {
           print('onJoinChannel: $channel, uid: $uid');
-          _channel!.sendMessage(AgoraRtmMessage.fromText(Message().sendUserInfo(
-            uid: uid,
-            name: widget.userName,
-            color: (Random().nextDouble() * 0xFFFFFFFF).toInt(),
-          )));
+          int randomColor = (Random().nextDouble() * 0xFFFFFFFF).toInt();
+          Map<String, String> name = {
+            'key': 'name',
+            'value': widget.userName,
+          };
+          Map<String, String> color = {
+            'key': 'color',
+            'value': randomColor.toString(),
+          };
+          _client!.addOrUpdateLocalUserAttributes([name, color]);
         });
         if (widget.uid != uid) {
           throw ("How can this happen?!?");
@@ -104,6 +109,7 @@ class _BroadcastPageState extends State<ParticipantPage> {
       }
     };
     await _client?.login(null, widget.uid.toString());
+
     _channel = await _client?.createChannel(widget.channelName);
     await _channel?.join();
     print("UID when joining int ${widget.uid} and string ${widget.uid.toString()}");
@@ -152,10 +158,6 @@ class _BroadcastPageState extends State<ParticipantPage> {
           break;
         case "activeUsers":
           _users = Message().parseActiveUsers(uids: parsedMessage[1]);
-          setState(() {});
-          break;
-        case "updateUser":
-          _users = Message().parseUserInfo(currentUsers: _users, userInfo: parsedMessage[1]);
           setState(() {});
           break;
         default:
