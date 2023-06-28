@@ -1,0 +1,29 @@
+---
+let error: String;
+if (Astro.request.method === "POST") {
+	try {
+		const data = await Astro.request.formData();
+		const channelName = data.get("channelName");
+		const uid = data.get("uid");
+		return Astro.redirect(`/channel/${channelName}?uid=${uid}`);
+	} catch (error) {
+		if (error instanceof Error) {
+			error = error.message;
+		}
+	}
+}
+---
+
+<h1>Astro x Agora</h1>
+<form method="POST">
+	{error && <p>{error}</p>}
+	<label>
+		Channel Name:
+		<input type="text" name="channelName" />
+	</label>
+	<label>
+		UID:
+		<input type="text" name="uid" />
+	</label>
+	<button>Submit</button>
+</form>
