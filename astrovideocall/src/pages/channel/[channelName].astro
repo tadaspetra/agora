@@ -1,16 +1,18 @@
 ---
-import Call from "../../components/Call.astro";
+import Call from "../../components/Call.tsx";
 
 const { channelName } = Astro.params;
 const uid = Astro.url.searchParams.get("uid");
-
-let inCall = false;
 ---
 
-{
-    inCall ? (
-        <Call client:load channelName={channelName} uid={uid} />
-    ) : (
-        <div>Not in call</div>
-    )
-}
+<div class="static m-0 p-0">
+    <p class="absolute z-10 mt-2 ml-2 text-2xl font-bold text-gray-900">
+        {channelName!}
+    </p>
+    <Call
+        client:only="react"
+        channelName={channelName!}
+        uid={uid!}
+        appId={import.meta.env.PUBLIC_AGORA_APP_ID}
+    />
+</div>
