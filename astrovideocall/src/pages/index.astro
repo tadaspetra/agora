@@ -1,11 +1,11 @@
 ---
 let error: String = "";
+
 if (Astro.request.method === "POST") {
 	try {
 		const data = await Astro.request.formData();
 		const channelName = data.get("channelName");
-		const uid = data.get("uid");
-		return Astro.redirect(`/channel/${channelName}?uid=${uid}`);
+		return Astro.redirect(`/channel/${channelName}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			error = error.message;
