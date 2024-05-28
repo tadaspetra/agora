@@ -1,4 +1,6 @@
-# Build a Video Call with Astro
+# Build a Video Call App with Astro and ReactJS
+
+![Thumbnail](assets/AstroReactJS_title.webp)
 
 A framework called Astro is gaining popularity, and so I decided to learn web development to give it a shot. I built a couple of sites with it, and then I thought: "I wonder if you can build video call apps with Astro." 
 
