@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package call_summary;
+
+message Message {
+  int32 vendor = 1;
+  int32 version = 2;
+  int32 seqnum = 3;
+  int32 uid = 4;
+  int32 flag = 5;
+  int64 time = 6;
+  int32 lang = 7;
+  int32 starttime = 8;
+  int32 offtime = 9;
+  repeated Word words = 10;
+}
+message Word {
+  string text = 1;
+  int32 start_ms = 2;
+  int32 duration_ms = 3;
+  bool is_final = 4;
+  double confidence = 5;
+}
