@@ -34,30 +34,28 @@ class _CallState extends State<Call> {
     initAgora();
   }
 
-  Future<void> startCloudRecording({required String channelName}) async {
+  Future<void> startTranscription({required String channelName}) async {
     final response = await http.post(
-      Uri.parse(
-          'https://agora-server-fdaj.onrender.com/start-transcribing/$channelName'),
+      Uri.parse('$serverUrl/start-transcribing/$channelName'),
     );
 
     if (response.statusCode == 200) {
-      print('Recording Started');
+      print('Transcription Started');
       taskId = jsonDecode(response.body)['taskId'];
       builderToken = jsonDecode(response.body)['builderToken'];
     } else {
-      print('Couldn\'t start the recording : ${response.statusCode}');
+      print('Couldn\'t start the transcription : ${response.statusCode}');
     }
   }
 
-  Future<void> stopCloudRecording() async {
+  Future<void> stopTranscription() async {
     final response = await http.post(
-      Uri.parse(
-          'https://agora-server-fdaj.onrender.com/stop-transcribing/$taskId/$builderToken'),
+      Uri.parse('$serverUrl/stop-transcribing/$taskId/$builderToken'),
     );
     if (response.statusCode == 200) {
-      print('Recording Stopped');
+      print('Transcription Stopped');
     } else {
-      print('Couldn\'t stop the recording : ${response.statusCode}');
+      print('Couldn\'t stop the transcription : ${response.statusCode}');
     }
   }
 
@@ -175,13 +173,13 @@ class _CallState extends State<Call> {
       uid: 0,
       options: const ChannelMediaOptions(),
     );
-    await startCloudRecording(channelName: widget.channelName);
+    await startTranscription(channelName: widget.channelName);
   }
 
   Future<void> disposeAgora() async {
     print('Disposing Agora');
     print(transcription);
-    await stopCloudRecording();
+    await stopTranscription();
     await _engine.leaveChannel();
     await _engine.release();
   }

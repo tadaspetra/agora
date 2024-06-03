@@ -70,14 +70,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Text('Start Video Call'),
               ),
               const SizedBox(height: 10),
-              const Row(
-                children: [
-                  Text(
-                    "Summary of the previous call",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+              summary != ''
+                  ? const Row(
+                      children: [
+                        Text(
+                          "Summary of the previous call",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )
+                  : const SizedBox(),
               Text(summary),
             ],
           ),
