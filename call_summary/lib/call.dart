@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'consts.dart';
@@ -35,7 +35,7 @@ class _CallState extends State<Call> {
   }
 
   Future<void> startTranscription({required String channelName}) async {
-    final response = await http.post(
+    final response = await post(
       Uri.parse('$serverUrl/start-transcribing/$channelName'),
     );
 
@@ -49,7 +49,7 @@ class _CallState extends State<Call> {
   }
 
   Future<void> stopTranscription() async {
-    final response = await http.post(
+    final response = await post(
       Uri.parse('$serverUrl/stop-transcribing/$taskId/$builderToken'),
     );
     if (response.statusCode == 200) {
