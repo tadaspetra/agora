@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: file.proto
+//  source: lib/protobuf/file.proto
 //
 // @dart = 2.12
 
