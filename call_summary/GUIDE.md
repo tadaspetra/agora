@@ -5,7 +5,7 @@ description: Build an app that transcribes your video call, and provides a summa
 
 AI is taking over the world. Resistance is futile. So, in this article, we're going to combine AI with Agora and build an app that summarizes the call you just had.
 
-![Screenshots of the app we will build](images/call%20summary.png)
+![Screenshots of the app we will build](images/call_summary.png)
 
 ## What you will need
 1. Flutter
@@ -14,19 +14,19 @@ AI is taking over the world. Resistance is futile. So, in this article, we're go
 
 Our starting point is going to be a simple video call app built with Agora. If you are not familiar with Agora, we have built a full course covering all the fundamentals. 
 
-Here is the starter code if you want to follow along.==Add link to code here==
+[Here is the starter code](https://github.com/tadaspetra/agora/tree/main/call_summary/starter-app) if you want to follow along.
 
 The starter code has a landing screen with only one button that invites you to join a call. This call happens on a single channel called `test` (it's a demo, okay). Within the call screen, you have the remote users video, your local video, and an end call button. Using the event handlers we add and remove the users into the view.
 
 If any part of the previous paragraph didn't make sense, please take a look at the course or the [quickstart on the Agora documentation](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=flutter).
+
 ## Speech to Text
-==Illustration of how speech to text works==
 Agora has a product called Real Time Transcription that you can connect to in order to start transcribing the call of a specific channel.
 
 Real Time Transcription is a RESTful API which connects to your call, and starts transcribing the audio that is being spoken. This transcription is written to a cloud provider, and can be accessed live within the call. 
 
 ### Backend
-==Illustration of how agora, server work together==
+![diagram of how the video call transcription works](images/backend-with-ai.png)
 The implementation of Real Time Transcription should be hosted on your own business server. The API call requires your Agora App ID, and sending it from your app over the network is not secure.
 
 We will be using [this server as our backend](https://github.com/tadaspetra/agora-server). There are two endpoints that we will use from this server.
@@ -210,7 +210,7 @@ void retrieveSummary(String transcription) async {
 ```
 
 ## Done
-==Illustration of how agora, server, and gemini all work together==
+![diagram of how the video call, transcription and AI all work together](images/backend-with-ai.png)
 
 This is a simplified example of how you can utilize the Agora SDK and AI to make your apps even more powerful. 
 
