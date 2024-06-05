@@ -26,7 +26,7 @@ Agora has a product called Real Time Transcription that you can connect to to st
 Real-time Transcription is a RESTful API that connects to your call and starts transcribing the audio being spoken. This transcription is written to a cloud provider and can be accessed live within the call. 
 
 ### Backend
-![diagram of how the video call transcription works](images/backend-with-ai.png)
+![diagram of how the video call transcription works](images/backend.png)
 Real-Time Transcription needs to be implemented on your business server. The API call requires your Agora App ID, and sending it from your app over the network is not secure.
 
 We will use [this server as our backend](https://github.com/tadaspetra/agora-server). This server will provide two endpoints.
