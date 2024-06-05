@@ -1,9 +1,9 @@
 ---
 title: Summarize your Video Call with Gemini
-description: Build an app that transcribes your video call, and provides a summary once the call is over.
+description: Build an app that transcribes your video call and provides a summary once the call is over.
 ---
 
-AI is taking over the world. Resistance is futile. So, in this article, we're going to combine AI with Agora and build an app that summarizes the call you just had.
+AI is taking over the world. Resistance is futile. So, in this article, we will combine AI with Agora and build an app that summarizes the call you just had.
 
 ![Screenshots of the app we will build](images/call_summary.png)
 
@@ -12,31 +12,31 @@ AI is taking over the world. Resistance is futile. So, in this article, we're go
 2. Agora Speech-to-Text Server (Can use [this example server](https://github.com/tadaspetra/agora-server))
 3. Gemini API Key
 
-Our starting point is going to be a simple video call app built with Agora. If you are not familiar with Agora, we have built a full course covering all the fundamentals. 
+Our starting point will be a simple video call app built with Agora. If you need to become more familiar with Agora, we have built an entire course covering all the fundamentals. 
 
 [Here is the starter code](https://github.com/tadaspetra/agora/tree/main/call_summary/starter-app) if you want to follow along.
 
-The starter code has a landing screen with only one button that invites you to join a call. This call happens on a single channel called `test` (it's a demo, okay). Within the call screen, you have the remote users video, your local video, and an end call button. Using the event handlers we add and remove the users into the view.
+The starter code has a landing screen with only one button that invites you to join a call. This call happens on a single channel called `test` (it's a demo, okay). You have the remote users' video, your local video, and an end-call button within the call screen. Using the event handlers, we add and remove the users from the view.
 
-If any part of the previous paragraph didn't make sense, please take a look at the course or the [quickstart on the Agora documentation](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=flutter).
+If any part of the previous paragraph didn't make sense, please take a look at the [Flutter quickstart within the Agora documentation](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=flutter).
 
 ## Speech to Text
-Agora has a product called Real Time Transcription that you can connect to in order to start transcribing the call of a specific channel.
+Agora has a product called Real Time Transcription that you can connect to to start transcribing the call of a specific channel.
 
-Real Time Transcription is a RESTful API which connects to your call, and starts transcribing the audio that is being spoken. This transcription is written to a cloud provider, and can be accessed live within the call. 
+Real-time Transcription is a RESTful API that connects to your call and starts transcribing the audio being spoken. This transcription is written to a cloud provider and can be accessed live within the call. 
 
 ### Backend
 ![diagram of how the video call transcription works](images/backend-with-ai.png)
-The implementation of Real Time Transcription should be hosted on your own business server. The API call requires your Agora App ID, and sending it from your app over the network is not secure.
+Real-Time Transcription needs to be implemented on your business server. The API call requires your Agora App ID, and sending it from your app over the network is not secure.
 
-We will be using [this server as our backend](https://github.com/tadaspetra/agora-server). There are two endpoints that we will use from this server.
+We will use [this server as our backend](https://github.com/tadaspetra/agora-server). This server will provide two endpoints.
 
 #### Start Real Time Transcription
 ```
 /start-transcribing/<--Channel Name-->
 ```
 
-A successful response should contain the Task Id and the Builder Token which need to be saved and used to stop the transcription.
+A successful response will contain the Task ID and the Builder Token, which you must save since you will need to use it to stop the transcription.
 
 ```
 {taskId: <--Task ID Value-->, builderToken: <--Builder Token Value-->}
@@ -48,9 +48,9 @@ A successful response should contain the Task Id and the Builder Token which nee
 
 
 ## Start Transcription within the Call
-To make a network call from your Flutter application, you can use the `http` package. Make sure you are using the same App Id on both the app and on the backend server. Then call your API to start the transcribing. 
+To make a network call from your Flutter application, you can use the `http` package. Make sure you use the same App ID on both the app and the backend server. Then, call your API to start the transcribing. 
 
-If everything worked properly you should receive back a Task ID and a Builder Token. Save these, because they will be needed to stop the transcription.
+You should receive a Task ID and a Builder Token back if everything works correctly. Save these because you will need them to stop the transcription.
 
 ```dart
 Future<void> startTranscription({required String channelName}) async {
@@ -70,7 +70,7 @@ Future<void> startTranscription({required String channelName}) async {
 
 We will call this function right after our join call method.
 
-When the transcription is started successfully, it acts as if another user has joined the call. It's not a real user, but it does have it's own uid which is defined within you backend server. If you are using the [server I linked above](https://github.com/tadaspetra/agora-server), the UID is `101`. You can exclude this from the remote users list in the `onUserJoined` event.
+When the transcription starts successfully, it acts as if another user has joined the call. It's not a real user, but it does have its own UID, which is defined within your backend server. If you are using the [server I linked above](https://github.com/tadaspetra/agora-server), the UID is `101`. You can exclude this from the remote user's list in the `onUserJoined` event.
 
 ```dart
 onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
@@ -82,7 +82,7 @@ onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
 }
 ```
 ## End Transcription
-To end the transcription, we use a similar function to starting, except we need to pass the Task ID and the Builder Token to the API call.
+To end the transcription, we use a similar function to starting, except we must pass the Task ID and the Builder Token to the API call.
 
 ```dart
 Future<void> stopTranscription() async {
@@ -97,9 +97,10 @@ Future<void> stopTranscription() async {
 }
 ```
 
-We will call this method in the `dispose`, right before we leave the channel and release the engine resource.
+We will call the `stopTranscription` method in our call screen's `dispose` method. This will stop the transcription before we leave the channel and release the engine resource.
+
 ## Retrieve the Transcription
-You can get access to the transcription through the `onStreamMessage` event in the event handler. 
+You can access the transcription through the `onStreamMessage` event in the event handler. 
 
 ```dart
 onStreamMessage: (RtcConnection connection, int uid, int streamId,
@@ -108,11 +109,11 @@ onStreamMessage: (RtcConnection connection, int uid, int streamId,
 }
 ```
 
-You will notice the code above will print out a bunch of numbers that probably don't mean anything to you unless you are an all-knowing AI. To decode we will need to use protobuf and create a readable object from this.
+You will notice the code above prints out an array of numbers that only mean something to you if you are an all-knowing AI. We will need to use protobuf and create a readable object from this to decode.
 ## Decode the Transcription
-To decode the message, we will use a Protocol Buffer (also refered to as protobuf). A protocol buffer is a language and platform neutral generator for serializing data. In this case we will serialize the random looking numbers into an object called `Message`. 
+We will use a Protocol Buffer (also refered to as protobuf) to decode the message. A protocol buffer is a language and platform neutral generator for serializing data. In this case, we will serialize the random-looking numbers into an object called `Message`. 
 
-You first need to create a `.proto` file with the following content. I will create this file in it's own folder: `lib/protobuf/file.proto`.
+First, create a `.proto` file with the following content. I will put this file in a new folder: `lib/protobuf/file.proto`.
 
 ```
 syntax = "proto3";
@@ -142,17 +143,17 @@ message Word {
 
 This is the input file for the generator to create our `Message` object. 
 
-In order to use protobuf you need to install the protobuf compiler to your computer. You can find the [download for it here](https://protobuf.dev/downloads/), or if you are using mac, you can install it using `brew install protobuf`.
+In order to use protobuf you need to install the protobuf compiler to your computer. You can find the [download for it here](https://protobuf.dev/downloads/), or if you are using a Mac, you can install it using `brew install protobuf`.
 
-You will also need to install the `protobuf` dart package within your project. You can do that using `flutter pub add protobuf`.
+You must also install the `protobuf` dart package within your project. You can do that using `flutter pub add protobuf`.
 
-Now run the following command in your terminal and you should see 4 files get generated in the same `lib/protobuf` folder.
+Now run the following command in your terminal. You should see four files generated in the same `lib/protobuf` folder.
 
 ```
 protoc --proto_path= --dart_out=. lib/protobuf/file.proto  
 ```
 
-Now we can use the new `Message` object to retrieve our transcription in english. This object contains a `words` array, with the sentences being spoken. Using the `isFinal` variable we trigger a print statement whenever the sentence is finished.
+Now, we can use the new `Message` object to retrieve our transcription in English. This object contains a `words` array with the transcribed sentences. Using the `isFinal` variable, we trigger a print statement whenever the sentence finishes.
 
 ```dart
 onStreamMessage: (RtcConnection connection, int uid, int streamId,
@@ -165,9 +166,9 @@ onStreamMessage: (RtcConnection connection, int uid, int streamId,
 ```
 
 ## Save the Transcription
-We have covered the transcription part, now we need to get the transcribed text, and prompt an AI to give us a summary. The simplest way to do this is to just concatenate a long string of the responses. There are definitely more sophisticated ways to do it, but for this demo it is good enough.
+We have covered the transcription part. Now, we need to get the transcribed text and prompt an AI to give us a summary. The simplest way to do this is to concatenate a long string of responses. There are definitely more sophisticated ways to do it, but for this demo, it is good enough.
 
-We can hold a string called `transcription` and add the text as it is finalized.
+We can hold a string called `transcription` and add the text as it finalizes.
 
 ```dart
  onStreamMessage: (RtcConnection connection, int uid, int streamId,
@@ -181,11 +182,11 @@ We can hold a string called `transcription` and add the text as it is finalized.
 ```
 
 ## Get Summary
-Back in the `main.dart` we can connect to Gemini using our apiKey. Then we can prompt it to summarize the video call. Then when you receive this response you can call `setState` and update the `summary` variable to see your changes reflected on the main page.
+Back in the `main.dart`, we can connect to Gemini using our API key. Then, we can prompt it to summarize the video call. When you receive this response, you can call `setState` and update the `summary` variable to see your changes reflected on the main page.
 
-> As I was testing this app I noticed that the response likes to mention the transcript I pass in. Because of this, I added some extra prompt to not mention the transcript.
+> As I was testing this app, I noticed that the response liked to mention the transcript I passed. Because of this, I added some extra prompts so it does not mention the transcript.
 
-This function is passed to the video call file, and then triggered when the call is over.
+This function is passed to the video call file and triggered when the call ends.
 
 ```dart
 late final GenerativeModel model;
@@ -212,7 +213,7 @@ void retrieveSummary(String transcription) async {
 ## Done
 ![diagram of how the video call, transcription and AI all work together](images/backend-with-ai.png)
 
-This is a simplified example of how you can utilize the Agora SDK and AI to make your apps even more powerful. 
+This guide covers a simplified example of utilizing the Agora SDK and AI to make your apps even more powerful. 
 
 You can find the [code here](https://github.com/tadaspetra/agora/tree/main/call_summary). And learn more about all the [Agora SDKs here](https://www.agora.io/en/).
 
